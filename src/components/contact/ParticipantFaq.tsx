@@ -57,7 +57,7 @@ export function ParticipantFaq() {
             className="group py-5 transition-colors hover:bg-[rgba(11,19,43,0.02)]"
           >
             <summary className="cursor-pointer list-none flex items-center justify-between gap-4 select-none focus-visible:outline-none">
-              <span className="font-display font-semibold text-sm md:text-base text-[#0B132B] group-open:text-[#e35619] transition-colors">
+              <span className="font-display font-semibold text-sm md:text-base text-[#0B132B] group-open:border-l-2 group-open:border-[#e35619] group-open:pl-3 transition-all">
                 {faq.question}
               </span>
               <span

@@ -7,9 +7,25 @@ import { Container } from '@/components/ui/Container';
 import { OpenCallsDirectory } from '@/components/open-calls/OpenCallsDirectory';
 
 export const metadata: Metadata = {
-  title: 'Open calls | Orion',
+  title: 'Open Calls',
   description:
     'Explore fully funded Erasmus+ youth exchanges and training courses. Find your next European mobility trajectory.',
+  alternates: {
+    canonical: '/open-calls',
+  },
+  openGraph: {
+    title: 'Open Calls — Orion',
+    description:
+      'Explore fully funded Erasmus+ youth exchanges and training courses. Find your next European mobility trajectory.',
+    url: '/open-calls',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Open Calls — Orion',
+    description:
+      'Explore fully funded Erasmus+ youth exchanges and training courses. Find your next European mobility trajectory.',
+  },
 };
 
 export default function OpenCallsPage() {

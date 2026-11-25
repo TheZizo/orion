@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
@@ -34,6 +34,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const [prevPathname, setPrevPathname] = useState(pathname);
+  const toggleBtnRef = useRef<HTMLButtonElement>(null);
 
   // Close mobile drawer whenever route changes (React recommended pattern)
   if (prevPathname !== pathname) {
@@ -41,16 +42,37 @@ export function Navbar() {
     setIsOpen(false);
   }
 
-  // Handle Escape key to dismiss mobile drawer
+  // Handle Escape key to dismiss mobile drawer and return focus to toggle button
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         setIsOpen(false);
+        requestAnimationFrame(() => toggleBtnRef.current?.focus());
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
+  // Lock background scroll while mobile drawer is open & close if resized to desktop
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('resize', handleResize);
+    };
   }, [isOpen]);
 
   const toggleMenu = useCallback(() => {
@@ -114,6 +136,7 @@ export function Navbar() {
         {/* Mobile Disclosure Button */}
         <div className="flex md:hidden items-center">
           <button
+            ref={toggleBtnRef}
             type="button"
             onClick={toggleMenu}
             aria-expanded={isOpen}
@@ -139,6 +162,7 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  onClick={() => setIsOpen(false)}
                   aria-current={active ? 'page' : undefined}
                   className={`type-caption py-2 px-3 border-l-2 transition-colors ${
                     active
@@ -155,6 +179,7 @@ export function Navbar() {
           <div className="pt-4 border-t border-[rgba(248,249,250,0.14)]">
             <Link
               href="/open-calls"
+              onClick={() => setIsOpen(false)}
               className="w-full inline-flex items-center justify-center bg-[#F8F9FA] text-[#0B132B] font-semibold text-sm px-4 py-2.5 rounded-none hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA]"
             >
               Explore open calls

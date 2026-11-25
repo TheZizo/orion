@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 const BASE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://orionyouth.eu'
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://www.orionyouth.eu'
 ).replace(/\/$/, '');
 
 export default function robots(): MetadataRoute.Robots {

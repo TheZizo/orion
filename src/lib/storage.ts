@@ -19,7 +19,11 @@ export class LocalStorageRepository<T extends { id: string }>
   constructor(private readonly storageKey: string) {}
 
   private isClient(): boolean {
-    return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+    try {
+      return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+    } catch {
+      return false;
+    }
   }
 
   async list(): Promise<T[]> {
@@ -109,9 +113,25 @@ export const contactRepository = new LocalStorageRepository<ContactMessage>(
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+export function isSafeHttpsUrl(rawUrl?: string): boolean {
+  const trimmed = rawUrl?.trim() ?? '';
+  if (!trimmed) return false;
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 function sanitize(val: unknown): string {
   if (typeof val !== 'string') return '';
   return val.trim();
+}
+
+function sanitizeSingleLine(val: unknown): string {
+  if (typeof val !== 'string') return '';
+  return val.replace(/[\r\n]+/g, ' ').trim();
 }
 
 export function validatePartnerInquiry(
@@ -119,16 +139,16 @@ export function validatePartnerInquiry(
 ): Record<string, string> {
   const errors: Record<string, string> = {};
 
-  const organizationName = sanitize(data.organizationName);
+  const organizationName = sanitizeSingleLine(data.organizationName);
   if (!organizationName) {
-    errors.organizationName = 'Organization name is required.';
+    errors.organizationName = 'Organisation name is required.';
   } else if (organizationName.length < 2) {
-    errors.organizationName = 'Organization name must be at least 2 characters.';
+    errors.organizationName = 'Organisation name must be at least 2 characters.';
   } else if (organizationName.length > 120) {
-    errors.organizationName = 'Organization name cannot exceed 120 characters.';
+    errors.organizationName = 'Organisation name cannot exceed 120 characters.';
   }
 
-  const country = sanitize(data.country);
+  const country = sanitizeSingleLine(data.country);
   if (!country) {
     errors.country = 'Country is required.';
   } else if (country.length < 2) {
@@ -137,7 +157,7 @@ export function validatePartnerInquiry(
     errors.country = 'Country cannot exceed 100 characters.';
   }
 
-  const contactPerson = sanitize(data.contactPerson);
+  const contactPerson = sanitizeSingleLine(data.contactPerson);
   if (!contactPerson) {
     errors.contactPerson = 'Contact person name is required.';
   } else if (contactPerson.length < 2) {
@@ -146,7 +166,7 @@ export function validatePartnerInquiry(
     errors.contactPerson = 'Contact person name cannot exceed 100 characters.';
   }
 
-  const email = sanitize(data.email);
+  const email = sanitizeSingleLine(data.email);
   if (!email) {
     errors.email = 'Email address is required.';
   } else if (!EMAIL_REGEX.test(email)) {
@@ -155,18 +175,18 @@ export function validatePartnerInquiry(
     errors.email = 'Email address cannot exceed 120 characters.';
   }
 
-  const topic = sanitize(data.topic);
+  const topic = sanitizeSingleLine(data.topic);
   if (!topic) {
-    errors.topic = 'Project topic / field is required.';
+    errors.topic = 'Partnership topic is required.';
   } else if (topic.length < 2) {
-    errors.topic = 'Project topic must be at least 2 characters.';
+    errors.topic = 'Partnership topic must be at least 2 characters.';
   } else if (topic.length > 150) {
-    errors.topic = 'Project topic cannot exceed 150 characters.';
+    errors.topic = 'Partnership topic cannot exceed 150 characters.';
   }
 
   const message = sanitize(data.message);
   if (!message) {
-    errors.message = 'Please provide details regarding your partnership proposal.';
+    errors.message = 'Please provide details regarding your partnership inquiry.';
   } else if (message.length < 20) {
     errors.message = 'Message must be at least 20 characters.';
   } else if (message.length > 4000) {
@@ -181,7 +201,7 @@ export function validateContactMessage(
 ): Record<string, string> {
   const errors: Record<string, string> = {};
 
-  const name = sanitize(data.name);
+  const name = sanitizeSingleLine(data.name);
   if (!name) {
     errors.name = 'Name is required.';
   } else if (name.length < 2) {
@@ -190,7 +210,7 @@ export function validateContactMessage(
     errors.name = 'Name cannot exceed 100 characters.';
   }
 
-  const email = sanitize(data.email);
+  const email = sanitizeSingleLine(data.email);
   if (!email) {
     errors.email = 'Email address is required.';
   } else if (!EMAIL_REGEX.test(email)) {
@@ -199,7 +219,7 @@ export function validateContactMessage(
     errors.email = 'Email address cannot exceed 120 characters.';
   }
 
-  const subject = sanitize(data.subject);
+  const subject = sanitizeSingleLine(data.subject);
   if (!subject) {
     errors.subject = 'Subject is required.';
   } else if (subject.length < 3) {

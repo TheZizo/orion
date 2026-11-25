@@ -187,7 +187,7 @@ describe('HybridApplicationFunnel & ExternalApplicationCard', () => {
     expect(screen.getByRole('link', { name: /Explore active open calls/i })).toBeInTheDocument();
   });
 
-  it('renders opening soon panel with Network Gateway Portal placeholder link and contact link', () => {
+  it('renders opening soon panel with early interest contact CTA and no dead portal link when gatewayPortalLive is false', () => {
     const openingSoonCall: OpenCall = {
       ...mockCalls[0],
       slug: 'the-financial-blueprint',
@@ -203,10 +203,16 @@ describe('HybridApplicationFunnel & ExternalApplicationCard', () => {
     expect(screen.getByText(/Hungary \(Location TBA\) in March 2027/i)).toBeInTheDocument();
     expect(screen.getByText(/Orion Network Gateway Portal/i)).toBeInTheDocument();
 
-    const portalLink = screen.getByRole('link', {
-      name: /Network Gateway Portal \(coming soon\)/i,
+    const earlyInterestLink = screen.getByRole('link', {
+      name: /Register early interest/i,
     });
-    expect(portalLink).toHaveAttribute('href', 'https://portal.orionyouth.eu');
+    expect(earlyInterestLink).toHaveAttribute(
+      'href',
+      '/contact?mode=participant&subject=Early%20interest%3A%20The%20Financial%20Blueprint'
+    );
+    expect(
+      screen.queryByRole('link', { name: /Network Gateway Portal/i })
+    ).not.toBeInTheDocument();
 
     const contactLink = screen.getByRole('link', {
       name: /Ask a question about this call/i,
@@ -240,7 +246,7 @@ describe('HybridApplicationFunnel & ExternalApplicationCard', () => {
     expect(screen.queryByRole('link', { name: /Open application form/i })).not.toBeInTheDocument();
   });
 
-  it('renders Network Gateway Portal CTA card for internal open calls', () => {
+  it('renders contact inquiry fallback for internal open calls when gatewayPortalLive is false and no externalFormUrl is set', () => {
     render(<HybridApplicationFunnel call={mockCalls[0]} />);
 
     expect(screen.getByTestId('network-gateway-portal-card')).toBeInTheDocument();
@@ -250,10 +256,29 @@ describe('HybridApplicationFunnel & ExternalApplicationCard', () => {
       })
     ).toBeInTheDocument();
 
+    const inquiryLink = screen.getByRole('link', {
+      name: /Submit application inquiry/i,
+    });
+    expect(inquiryLink).toHaveAttribute(
+      'href',
+      '/contact?mode=participant&subject=Application%20inquiry%3A%20Coastal%20Horizons%3A%20Ocean%20Stewardship'
+    );
+  });
+
+  it('renders Network Gateway Portal CTA link for internal open calls when externalFormUrl is provided', () => {
+    const callWithUrl: OpenCall = {
+      ...mockCalls[0],
+      externalFormUrl: 'https://portal.orionyouth.eu/apply/coastal',
+    };
+    render(<HybridApplicationFunnel call={callWithUrl} />);
+
     const portalLink = screen.getByRole('link', {
       name: /Open Network Gateway Portal/i,
     });
-    expect(portalLink).toHaveAttribute('href', 'https://portal.orionyouth.eu');
+    expect(portalLink).toHaveAttribute(
+      'href',
+      'https://portal.orionyouth.eu/apply/coastal'
+    );
     expect(portalLink).toHaveAttribute('target', '_blank');
   });
 });

@@ -16,6 +16,7 @@ describe('orionData', () => {
       expect(ORION_ORG.legalName).toBe('Orion Fiatalok Informális Csoportja');
       expect(ORION_ORG.email).toBe('zeid@orionyouth.eu');
       expect(ORION_ORG.grantReference).toBe('2026-1-HU01-KA152-YOU-000399636');
+      expect(ORION_ORG.gatewayPortalLive).toBe(false);
       expect(ORION_ORG.oid).toBe('');
       expect(ORION_ORG.pifUrl).toBe('');
     });
@@ -97,11 +98,15 @@ describe('orionData', () => {
       expect(reforest).toBeDefined();
       expect(reforest?.locationLabel).toContain('Lacu Roșu');
       expect(reforest?.status).toBe('Completed');
+      expect(
+        reforest?.impactMetrics.some((metric) => metric.value === '1,000+')
+      ).toBe(true);
 
       const blueprint = getProjectBySlug('the-financial-blueprint');
       expect(blueprint).toBeDefined();
       expect(blueprint?.grantReference).toBe('2026-1-HU01-KA152-YOU-000399636');
-      expect(blueprint?.status).toBe('Ongoing');
+      expect(blueprint?.status).toBe('Upcoming');
+      expect(blueprint?.gallery).toEqual([]);
     });
 
     it('filters projects by status', () => {
@@ -109,9 +114,9 @@ describe('orionData', () => {
       expect(completed.length).toBe(1);
       expect(completed[0].slug).toBe('reforest');
 
-      const ongoing = getProjects({ status: 'Ongoing' });
-      expect(ongoing.length).toBe(1);
-      expect(ongoing[0].slug).toBe('the-financial-blueprint');
+      const upcoming = getProjects({ status: 'Upcoming' });
+      expect(upcoming.length).toBe(1);
+      expect(upcoming[0].slug).toBe('the-financial-blueprint');
     });
   });
 

@@ -12,6 +12,22 @@ export const metadata: Metadata = {
   title: 'About Orion — Origin, Capacity & Leadership',
   description:
     'Official profile of Orion Fiatalok Informális Csoportja (Orion Informal Group of Young People) in Debrecen, Hungary: dual hosting and sending mandate, four operational pillars, and founding leadership team.',
+  alternates: {
+    canonical: '/about',
+  },
+  openGraph: {
+    title: 'About Orion — Origin, Capacity & Leadership — Orion',
+    description:
+      'Official profile of Orion Fiatalok Informális Csoportja (Orion Informal Group of Young People) in Debrecen, Hungary: dual hosting and sending mandate, four operational pillars, and founding leadership team.',
+    url: '/about',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About Orion — Origin, Capacity & Leadership — Orion',
+    description:
+      'Official profile of Orion Fiatalok Informális Csoportja (Orion Informal Group of Young People) in Debrecen, Hungary: dual hosting and sending mandate, four operational pillars, and founding leadership team.',
+  },
 };
 
 // 8 deterministic fixed stars for the Deep Observatory Night canvas (percentage coordinates)
@@ -112,22 +128,22 @@ export default function AboutPage() {
               {/* Documentary Photo Frame */}
               <div className="aspect-[16/10] relative overflow-hidden border border-[rgba(11,19,43,0.12)] bg-[#0B132B]">
                 <Image
-                  src="/images/projects/debrecen-1.jpg"
-                  alt="Orion team workshop and coordination session at Debrecen headquarters"
+                  src="/images/projects/reforest-2.jpg"
+                  alt="Orion Fiatalok Informális Csoportja delegation and European partners at ReForest in Lacu Roșu"
                   fill
                   sizes="(max-width: 1024px) 100vw, 48vw"
-                  className="object-cover object-center"
+                  className="object-cover object-[50%_38%]"
                   priority
                 />
-                {/* Top-left coordinate badge (comma-separated, zero spaced em-dash) */}
+                {/* Top-left cohort badge */}
                 <div className="absolute top-3 left-3 bg-[#0B132B] text-[#F8F9FA] px-3 py-1.5 text-xs font-display tracking-tight tabular-nums z-10">
-                  47.53° N, 21.62° E, Debrecen, Hungary
+                  October 2026, Carpathian Cohort
                 </div>
               </div>
 
               {/* Attached Caption Strip */}
               <div className="bg-white border-x border-b border-[rgba(11,19,43,0.12)] px-4 py-3 text-xs text-[rgba(11,19,43,0.72)]">
-                Orion team strategy and community workshop at Debrecen headquarters.
+                Orion Fiatalok Informális Csoportja delegation alongside European partner teams at ReForest in Lacu Roșu, Romania.
               </div>
 
               {/* Attached Institutional Profile Spec Matrix */}

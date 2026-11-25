@@ -63,7 +63,7 @@ export function CallCard({ call, className = '' }: CallCardProps) {
         <div className="lg:col-span-4">
           <dl className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4 text-[14px]">
             <div>
-              <dt className="text-[12px] text-[rgba(11,19,43,0.55)] font-normal">
+              <dt className="text-[12px] text-[rgba(11,19,43,0.68)] font-normal">
                 When
               </dt>
               <dd className="font-medium text-[#0B132B] tabular-nums mt-0.5">
@@ -72,7 +72,7 @@ export function CallCard({ call, className = '' }: CallCardProps) {
             </div>
 
             <div>
-              <dt className="text-[12px] text-[rgba(11,19,43,0.55)] font-normal">
+              <dt className="text-[12px] text-[rgba(11,19,43,0.68)] font-normal">
                 Where
               </dt>
               <dd className="font-medium text-[#0B132B] mt-0.5">
@@ -81,7 +81,7 @@ export function CallCard({ call, className = '' }: CallCardProps) {
             </div>
 
             <div>
-              <dt className="text-[12px] text-[rgba(11,19,43,0.55)] font-normal">
+              <dt className="text-[12px] text-[rgba(11,19,43,0.68)] font-normal">
                 Deadline
               </dt>
               <dd className="font-medium text-[#0B132B] tabular-nums mt-0.5">
@@ -96,7 +96,7 @@ export function CallCard({ call, className = '' }: CallCardProps) {
           <StatusBadge status={call.status} tone="light" />
 
           <div className="space-y-3 w-full lg:text-right">
-            <span className="block text-[13px] text-[rgba(11,19,43,0.65)] font-medium">
+            <span className="block text-[13px] text-[rgba(11,19,43,0.65)] font-medium whitespace-nowrap">
               {applicationHint}
             </span>
 

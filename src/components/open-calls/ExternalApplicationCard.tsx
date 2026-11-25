@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExternalLink, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { OpenCall } from '@/types/orion';
+import { isSafeHttpsUrl } from '@/lib/storage';
 import { Button } from '@/components/ui/Button';
 
 export interface ExternalApplicationCardProps {
@@ -19,15 +20,7 @@ export function ExternalApplicationCard({
   className = '',
 }: ExternalApplicationCardProps) {
   const rawUrl = call.externalFormUrl?.trim() ?? '';
-  let isSecureUrl = false;
-  if (rawUrl) {
-    try {
-      const parsed = new URL(rawUrl);
-      isSecureUrl = parsed.protocol === 'https:';
-    } catch {
-      isSecureUrl = false;
-    }
-  }
+  const isSecureUrl = isSafeHttpsUrl(rawUrl);
 
   return (
     <div

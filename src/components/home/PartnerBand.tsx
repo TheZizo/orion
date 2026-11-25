@@ -110,7 +110,11 @@ export function PartnerBand() {
                 </a>
 
                 {copiedField === 'email' && (
-                  <div role="status" aria-live="polite" className="text-xs text-[#E35619] font-medium">
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="px-2.5 py-1 text-xs bg-[#0B132B] border border-[rgba(248,249,250,0.28)] text-[#F8F9FA] font-medium"
+                  >
                     Copied to clipboard
                   </div>
                 )}
@@ -123,7 +127,7 @@ export function PartnerBand() {
                 <span className="text-xs text-[rgba(248,249,250,0.55)] font-display block">
                   Confirmed grant reference
                 </span>
-                <div className="text-lg font-semibold text-[#F8F9FA] tabular-nums mt-1 break-all">
+                <div className="text-lg font-semibold text-[#F8F9FA] tabular-nums mt-1 break-words">
                   {grantRef}
                 </div>
                 <p className="text-xs text-[rgba(248,249,250,0.65)] mt-1">
@@ -143,7 +147,11 @@ export function PartnerBand() {
                 </button>
 
                 {copiedField === 'grant' && (
-                  <div role="status" aria-live="polite" className="text-xs text-[#E35619] font-medium">
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="px-2.5 py-1 text-xs bg-[#0B132B] border border-[rgba(248,249,250,0.28)] text-[#F8F9FA] font-medium"
+                  >
                     Copied to clipboard
                   </div>
                 )}
@@ -154,7 +162,7 @@ export function PartnerBand() {
           {/* Action CTAs */}
           <div className="flex flex-wrap items-center gap-4 pt-2">
             <Link
-              href="/partners"
+              href="/partners#partner-inquiry"
               className="inline-flex items-center justify-center bg-[#F8F9FA] text-[#0B132B] font-semibold text-sm px-6 py-3 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA]"
             >
               Send a partnership inquiry

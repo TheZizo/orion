@@ -7,7 +7,7 @@ import { getTeam } from '@/lib/orionData';
 
 describe('About Partition Components', () => {
   describe('ConstellationLeadershipGrid', () => {
-    it('renders all 5 team members with headings, monograms, portrait placeholders, and verified PIF roles and biographies', () => {
+    it('renders all 5 team members with headings, monograms, and verified PIF roles and biographies without portrait placeholder text', () => {
       const team = getTeam();
       const { container } = render(<ConstellationLeadershipGrid team={team} />);
 
@@ -41,8 +41,8 @@ describe('About Partition Components', () => {
       expect(screen.getAllByText('JS')).toHaveLength(2); // Jázmin Szabó and Jordan Smith
       expect(screen.getByText('MI')).toBeInTheDocument(); // Mehmet Ismail
 
-      // 3. Verify portrait placeholder frames and 0 <img> tags when no photoUrl is set
-      expect(screen.getAllByText('Portrait placeholder')).toHaveLength(5);
+      // 3. Verify no portrait placeholder text and 0 <img> tags when no photoUrl is set
+      expect(screen.queryByText('Portrait placeholder')).toBeNull();
       const images = container.querySelectorAll('img');
       expect(images.length).toBe(0);
 

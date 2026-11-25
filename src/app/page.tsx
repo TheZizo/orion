@@ -12,6 +12,21 @@ import { PartnerBand } from '@/components/home/PartnerBand';
 export const metadata: Metadata = {
   description:
     'Orion Fiatalok Informális Csoportja is an international Erasmus+ youth initiative based in Debrecen, Hungary. Explore interactive European youth exchanges, training courses, and mobility wayfinding.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Orion — Spark something bigger.',
+    description:
+      'Orion Fiatalok Informális Csoportja is an international Erasmus+ youth initiative based in Debrecen, Hungary. Explore interactive European youth exchanges, training courses, and mobility wayfinding.',
+    url: '/',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Orion — Spark something bigger.',
+    description:
+      'Orion Fiatalok Informális Csoportja is an international Erasmus+ youth initiative based in Debrecen, Hungary. Explore interactive European youth exchanges, training courses, and mobility wayfinding.',
+  },
 };
 
 /**
@@ -29,7 +44,7 @@ export const metadata: Metadata = {
  */
 export default function HomePage() {
   return (
-    <main className="w-full min-h-screen">
+    <div className="w-full min-h-screen">
       {/* 1. Hero Section: 3D Celestial Orrery */}
       <HeroSection />
 
@@ -53,6 +68,6 @@ export default function HomePage() {
 
       {/* 8. Partner Band: Night Credentials & Direct Dispatch */}
       <PartnerBand />
-    </main>
+    </div>
   );
 }

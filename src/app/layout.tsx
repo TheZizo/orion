@@ -20,11 +20,14 @@ const inter = Inter({
 });
 
 const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://orionyouth.eu'
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://www.orionyouth.eu'
 ).replace(/\/$/, '');
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: './',
+  },
   title: {
     template: '%s — Orion',
     default: 'Orion — Spark something bigger.',
@@ -50,9 +53,30 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'EducationalOrganization',
+    name: ORION_ORG.legalName,
+    alternateName: ORION_ORG.legalNameLatin,
+    url: siteUrl,
+    email: ORION_ORG.email,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Debrecen',
+      postalCode: '4027',
+      addressCountry: 'HU',
+    },
+  };
+
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
       <body className="min-h-screen flex flex-col bg-[#F8F9FA] text-[#0B132B] font-body antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd).replace(/</g, '\\u003c'),
+          }}
+        />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#e35619] focus:text-[#0B132B] font-bold shadow-lg"

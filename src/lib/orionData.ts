@@ -21,6 +21,7 @@ export const ORION_ORG = {
   coordinates: { lat: 47.53, lng: 21.62 } as Coordinates,
   email: 'zeid@orionyouth.eu',
   gatewayPortalUrl: 'https://portal.orionyouth.eu',
+  gatewayPortalLive: false as boolean,
   oid: '',
   grantReference: '2026-1-HU01-KA152-YOU-000399636',
   pifUrl: '',
@@ -172,7 +173,7 @@ export const SEED_PROJECTS: Project[] = [
     ],
     focus: 'Environmental stewardship, hands-on reforestation, and digital ecological transformation',
     summary:
-      '40 young people and 8 leaders from Romania, Portugal, Czechia, and Hungary convened in the Harghita mountains for 12 days to plant native saplings, conduct ecological stream surveys, and build lasting European solidarity.',
+      '40 young people and 8 leaders from Romania, Portugal, Czechia, and Hungary convened in the Harghita mountains for 12 days (October 11–22, 2026, including arrival and departure days) to plant native saplings, conduct ecological stream surveys, and build lasting European solidarity.',
     emotionalSummary:
       'In the quiet mist of Lacu Roșu, we learned that planting trees is really planting faith in each other.',
     impactMetrics: [
@@ -192,9 +193,9 @@ export const SEED_PROJECTS: Project[] = [
         detail: 'October 11–22, 2026 at Lacu Roșu',
       },
       {
-        label: 'Core methodology',
-        value: '3 phases',
-        detail: 'Digital tools, reforestation & civic action',
+        label: 'Seedlings planted',
+        value: '1,000+',
+        detail: 'Native fir & spruce across Harghita',
       },
     ],
     gallery: [
@@ -254,7 +255,7 @@ export const SEED_PROJECTS: Project[] = [
     slug: 'the-financial-blueprint',
     title: 'The Financial Blueprint — Erasmus+ Youth Exchange',
     actionType: 'Youth Exchange',
-    status: 'Ongoing',
+    status: 'Upcoming',
     locationLabel: 'Location TBA, Hungary',
     country: 'Hungary',
     coordinates: { lat: 47.53, lng: 21.62 },
@@ -296,21 +297,7 @@ export const SEED_PROJECTS: Project[] = [
         detail: '50% inclusion of youth with fewer opportunities',
       },
     ],
-    gallery: [
-      {
-        src: '/images/projects/debrecen-1.jpg',
-        alt: 'Orion youth team in Debrecen, Hungary',
-        caption:
-          'Hosted by Orion Fiatalok Informális Csoportja preparing workshop modules',
-        category: 'Workshops',
-        date: 'March 2027',
-        location: 'Debrecen, Hungary',
-        photographer: 'Orion Field Archive',
-        featured: true,
-        projectTitle: 'The Financial Blueprint — Erasmus+ Youth Exchange',
-        projectSlug: 'the-financial-blueprint',
-      },
-    ],
+    gallery: [],
     quotes: [
       {
         quote:

@@ -111,10 +111,13 @@ export function PageHeader({
                   {breadcrumb.map((item, idx) => {
                     const isLast = idx === breadcrumb.length - 1;
                     return (
-                      <li key={idx} className="flex items-center gap-2">
+                      <li
+                        key={idx}
+                        className={`flex items-center gap-2${isLast ? ' min-w-0' : ''}`}
+                      >
                         {idx > 0 && (
                           <span
-                            className="text-[rgba(248,249,250,0.35)] select-none text-xs"
+                            className="text-[rgba(248,249,250,0.35)] select-none text-xs whitespace-nowrap shrink-0"
                             aria-hidden="true"
                           >
                             /
@@ -123,13 +126,17 @@ export function PageHeader({
                         {item.href && !isLast ? (
                           <Link
                             href={item.href}
-                            className="hover:text-[#F8F9FA] transition-colors underline-offset-4 hover:underline"
+                            className="whitespace-nowrap hover:text-[#F8F9FA] transition-colors underline-offset-4 hover:underline"
                           >
                             {item.label}
                           </Link>
                         ) : (
                           <span
-                            className={isLast ? 'text-[#F8F9FA] font-medium' : undefined}
+                            className={
+                              isLast
+                                ? 'text-[#F8F9FA] font-medium min-w-0 break-words'
+                                : 'whitespace-nowrap'
+                            }
                             aria-current={isLast ? 'page' : undefined}
                           >
                             {item.label}

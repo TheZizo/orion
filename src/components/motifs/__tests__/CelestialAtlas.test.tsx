@@ -100,6 +100,24 @@ describe('CelestialAtlas component & projection math', () => {
       ).toBeInTheDocument();
     });
 
+    it('updates NodeInspector when a floating SVG label is clicked', () => {
+      const { container } = render(<CelestialAtlas />);
+
+      const svg = container.querySelector('svg');
+      expect(svg).toBeInTheDocument();
+
+      const reforestLabel = Array.from(svg!.querySelectorAll('text')).find(
+        (el) => el.textContent === 'ReForest ’26'
+      );
+      expect(reforestLabel).toBeDefined();
+
+      fireEvent.click(reforestLabel!);
+
+      expect(
+        screen.getByRole('heading', { level: 3, name: /ReForest — Transylvania, Romania/i })
+      ).toBeInTheDocument();
+    });
+
     it('updates active node when tab strip button is clicked', () => {
       render(<CelestialAtlas />);
 

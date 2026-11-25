@@ -26,7 +26,7 @@ describe('Projects Partition Components', () => {
       expect(count).toHaveAttribute('aria-live', 'polite');
     });
 
-    it('filters projects by status (Completed vs Ongoing)', () => {
+    it('filters projects by status (Completed vs Upcoming)', () => {
       render(<ProjectsArchive initialProjects={SEED_PROJECTS} />);
 
       const statusSelect = screen.getByLabelText(/status/i);
@@ -42,6 +42,17 @@ describe('Projects Partition Components', () => {
       ).not.toBeInTheDocument();
 
       expect(screen.getByText(/showing 1 project \(filtered from 2\)/i)).toBeInTheDocument();
+
+      fireEvent.change(statusSelect, { target: { value: 'Upcoming' } });
+
+      expect(
+        screen.getByRole('heading', {
+          name: /the financial blueprint — erasmus\+ youth exchange/i,
+        })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('heading', { name: /reforest — erasmus\+ youth exchange/i })
+      ).not.toBeInTheDocument();
     });
 
     it('filters projects by country', () => {
@@ -67,7 +78,7 @@ describe('Projects Partition Components', () => {
       fireEvent.change(countrySelect, { target: { value: 'Romania' } });
 
       const statusSelect = screen.getByLabelText(/status/i);
-      fireEvent.change(statusSelect, { target: { value: 'Ongoing' } });
+      fireEvent.change(statusSelect, { target: { value: 'Upcoming' } });
 
       expect(
         screen.getByText(/no mobilities found matching the selected filters/i)
@@ -94,10 +105,10 @@ describe('Projects Partition Components', () => {
         screen.getByRole('heading', { name: /field photography showcase/i })
       ).toBeInTheDocument();
 
-      // Check category filter pills in showcase (3 ReForest + 1 Financial Blueprint = 4 items)
-      expect(screen.getByRole('tab', { name: /all 4/i })).toBeInTheDocument();
+      // Check category filter pills in showcase (3 ReForest items)
+      expect(screen.getByRole('tab', { name: /all 3/i })).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: /field action 1/i })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: /workshops 2/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /workshops 1/i })).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: /community & culture 1/i })).toBeInTheDocument();
     });
   });

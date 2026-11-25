@@ -1,12 +1,15 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Download, MapPin } from 'lucide-react';
 import {
   SEED_OPEN_CALLS,
+  ORION_ORG,
   getOpenCallBySlug,
   formatDateRange,
 } from '@/lib/orionData';
+import { isSafeHttpsUrl } from '@/lib/storage';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -29,14 +32,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!call) {
     return {
-      title: 'Call not found | Orion',
+      title: 'Call Not Found',
       description: 'The requested open call trajectory could not be found.',
     };
   }
 
   return {
-    title: `${call.title} | Orion Open Calls`,
+    title: call.title,
     description: call.summary,
+    alternates: {
+      canonical: `/open-calls/${call.slug}`,
+    },
+    openGraph: {
+      title: `${call.title} — Orion`,
+      description: call.summary,
+      url: `/open-calls/${call.slug}`,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${call.title} — Orion`,
+      description: call.summary,
+    },
   };
 }
 
@@ -49,6 +66,30 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
   }
 
   const datesFormatted = formatDateRange(call.startDate, call.endDate);
+
+  const educationEventJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'EducationEvent',
+    name: call.title,
+    description: call.summary,
+    startDate: call.startDate,
+    endDate: call.endDate,
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    location: {
+      '@type': 'Place',
+      name: call.venue || `${call.city}, ${call.country}`,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: call.city,
+        addressCountry: call.country,
+      },
+    },
+    organizer: {
+      '@type': 'Organization',
+      name: ORION_ORG.legalName,
+      url: (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.orionyouth.eu').replace(/\/$/, ''),
+    },
+  };
 
   const headerAside = (
     <aside aria-label="Key details" className="border-t border-[rgba(248,249,250,0.14)] pt-4 lg:border-t-0 lg:pt-0">
@@ -77,6 +118,12 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(educationEventJsonLd).replace(/</g, '\\u003c'),
+        }}
+      />
       {/* Page Header on Midnight Navy with Deterministic Stardust & Elliptical Orbit */}
       <PageHeader
         breadcrumb={[
@@ -253,16 +300,20 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
 
               {/* Infopack Access Block */}
               <div className="pt-6 border-t border-[rgba(11,19,43,0.10)]">
-                {call.infopackUrl && call.infopackUrl.startsWith('http') ? (
+                {isSafeHttpsUrl(call.infopackUrl) ? (
                   <a
                     href={call.infopackUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center rounded-none px-5 py-2.5 text-sm md:text-base font-semibold tracking-tight border border-[rgba(11,19,43,0.18)] text-[#0B132B] hover:bg-[rgba(11,19,43,0.05)] hover:border-[rgba(11,19,43,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 transition-colors duration-150 cursor-pointer select-none w-full sm:w-auto"
                   >
-                    <span>View official ReForest page &amp; infopack ↗</span>
+                    <span>
+                      {call.slug.includes('reforest')
+                        ? 'View official ReForest page & infopack ↗'
+                        : 'View official project page & infopack ↗'}
+                    </span>
                   </a>
-                ) : call.infopackUrl ? (
+                ) : call.infopackUrl && call.infopackUrl.startsWith('/') ? (
                   <a
                     href={call.infopackUrl}
                     download
@@ -326,12 +377,23 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
                 </dl>
 
                 <div className="pt-2">
-                  <a
-                    href="#apply"
-                    className="block w-full py-2.5 px-4 text-center text-xs font-semibold bg-[#0B132B] text-[#F8F9FA] hover:bg-[#111D3B] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B]"
-                  >
-                    Jump to application
-                  </a>
+                  {call.status === 'Closed' ? (
+                    <Link
+                      href="/open-calls"
+                      className="block w-full py-2.5 px-4 text-center text-xs font-semibold bg-[#0B132B] text-[#F8F9FA] hover:bg-[#111D3B] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B]"
+                    >
+                      Browse active open calls
+                    </Link>
+                  ) : (
+                    <a
+                      href="#apply"
+                      className="block w-full py-2.5 px-4 text-center text-xs font-semibold bg-[#0B132B] text-[#F8F9FA] hover:bg-[#111D3B] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B]"
+                    >
+                      {call.status === 'Opening soon'
+                        ? 'Register early interest'
+                        : 'Jump to application'}
+                    </a>
+                  )}
                 </div>
               </div>
             </aside>

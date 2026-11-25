@@ -56,7 +56,7 @@ describe('Partners Partition Components', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/organization name is required/i)
+          screen.getByText(/organisation name is required/i)
         ).toBeInTheDocument();
         expect(screen.getByText(/country is required/i)).toBeInTheDocument();
         expect(
@@ -128,6 +128,43 @@ describe('Partners Partition Components', () => {
           'mailto:zeid@orionyouth.eu'
         );
       });
+    });
+
+    it('shows inline validation error and skips fetch when message is shorter than 20 characters', async () => {
+      render(<InstitutionalDossier />);
+
+      fireEvent.change(screen.getByLabelText(/organisation name/i), {
+        target: { value: 'Asociación Aurora' },
+      });
+      fireEvent.change(screen.getByLabelText(/country/i), {
+        target: { value: 'Spain' },
+      });
+      fireEvent.change(screen.getByLabelText(/contact person/i), {
+        target: { value: 'Sofia Ruiz' },
+      });
+      fireEvent.change(screen.getByLabelText(/email address/i), {
+        target: { value: 'sofia@aurora-youth.es' },
+      });
+      fireEvent.change(screen.getByLabelText(/partnership topic/i), {
+        target: { value: 'KA152 Consortium' },
+      });
+      fireEvent.change(
+        screen.getByLabelText(/collaboration scope & message/i),
+        {
+          target: { value: 'Too short' },
+        }
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: /send partnership inquiry/i })
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(/message must be at least 20 characters/i)
+        ).toBeInTheDocument();
+      });
+      expect(globalThis.fetch).not.toHaveBeenCalled();
     });
   });
 });

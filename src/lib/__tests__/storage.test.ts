@@ -77,15 +77,30 @@ describe('storage & validation', () => {
   });
 
   describe('validatePartnerInquiry', () => {
-    it('catches missing organization and invalid email', () => {
+    it('catches missing organisation and invalid email using British spelling', () => {
       const errors = validatePartnerInquiry({
         organizationName: '',
         email: 'bad-email',
       });
-      expect(errors.organizationName).toBeDefined();
+      expect(errors.organizationName).toBe('Organisation name is required.');
       expect(errors.email).toBeDefined();
       expect(errors.country).toBeDefined();
-      expect(errors.message).toBeDefined();
+      expect(errors.topic).toBe('Partnership topic is required.');
+      expect(errors.message).toBe(
+        'Please provide details regarding your partnership inquiry.'
+      );
+    });
+
+    it('catches short messages under 20 characters', () => {
+      const errors = validatePartnerInquiry({
+        organizationName: 'Valid Org',
+        country: 'Hungary',
+        contactPerson: 'Jane Doe',
+        email: 'jane@example.org',
+        topic: 'Youth Exchange',
+        message: 'Too short message',
+      });
+      expect(errors.message).toBe('Message must be at least 20 characters.');
     });
 
     it('enforces length caps on partner inquiry fields', () => {

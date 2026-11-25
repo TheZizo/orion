@@ -1,6 +1,14 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getProjectBySlug } from '@/lib/orionData';
+
+const FALLBACK_IMPACT_METRICS = [
+  { label: 'Young changemakers', value: '40 + 8' },
+  { label: 'Partner countries', value: '4' },
+  { label: 'Mobility duration', value: '12 days' },
+  { label: 'Seedlings planted', value: '1,000+' },
+];
 
 /**
  * ReForestStory Component — Daylight Editorial Spread (#F8F9FA)
@@ -17,12 +25,8 @@ export function ReForestStory() {
     country: 'Participant, October 2026',
   };
 
-  const impactMetrics = [
-    { label: 'Young changemakers', value: '40 + 8' },
-    { label: 'Partner countries', value: '4' },
-    { label: 'Mobility duration', value: '12 days' },
-    { label: 'Seedlings planted', value: '1,200+' },
-  ];
+  const impactMetrics =
+    getProjectBySlug('reforest')?.impactMetrics ?? FALLBACK_IMPACT_METRICS;
 
   return (
     <section className="w-full bg-[#F8F9FA] text-[#0B132B] py-20 md:py-28 border-b border-[rgba(11,19,43,0.10)]">
@@ -37,7 +41,7 @@ export function ReForestStory() {
                 fill
                 sizes="(max-width: 1024px) 100vw, 58vw"
                 priority
-                className="object-cover object-center"
+                className="object-cover object-[50%_38%]"
               />
               {/* Top-left coordinate overlay badge */}
               <div className="absolute top-3 left-3 bg-[#0B132B] text-[#F8F9FA] px-3 py-1.5 text-xs font-display tracking-tight tabular-nums z-10">
@@ -48,7 +52,7 @@ export function ReForestStory() {
             {/* Caption bar directly below the image */}
             <div className="bg-white border-x border-b border-[rgba(11,19,43,0.12)] px-4 py-3 text-xs text-[rgba(11,19,43,0.75)] flex flex-wrap justify-between gap-2">
               <span className="tabular-nums">
-                October 11–22, 2026, Alpine Meadow, Lacu Roșu, Harghita
+                October 11–22, 2026 (incl. travel days), Lacu Roșu, Harghita
               </span>
               <span>
                 Co-funded by the European Union, hosted by Asociația Agoje with Orion
@@ -76,7 +80,7 @@ export function ReForestStory() {
                 &ldquo;{quote.quote}&rdquo;
               </blockquote>
               <figcaption className="text-xs font-medium text-[rgba(11,19,43,0.65)]">
-                {quote.name} — {quote.country}
+                {quote.name}, {quote.country}
               </figcaption>
             </figure>
 

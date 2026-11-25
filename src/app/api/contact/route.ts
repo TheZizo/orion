@@ -5,6 +5,96 @@ import type { ContactMessage, PartnerInquiry } from '@/types/orion';
 
 interface ContactApiPayload extends Partial<ContactMessage>, Partial<PartnerInquiry> {
   kind?: 'contact' | 'partner';
+  orion_hp_trap?: string;
+}
+
+const MAX_REQUESTS = 5;
+const WINDOW_MS = 10 * 60 * 1000;
+const MAX_RATE_LIMIT_ENTRIES = 1000;
+const rateLimitStore = new Map<string, number[]>();
+
+export function resetContactRateLimit(): void {
+  rateLimitStore.clear();
+}
+
+function extractClientIp(request: Request): string {
+  const realIp = request.headers.get('x-real-ip')?.trim();
+  if (realIp) return realIp;
+
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    // Reverse proxies append the connecting client IP to the right edge
+    const lastIp = forwardedFor
+      .split(',')
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .pop();
+    if (lastIp) return lastIp;
+  }
+
+  return 'unknown';
+}
+
+function pruneExpiredRateLimits(now: number): void {
+  const windowStart = now - WINDOW_MS;
+  for (const [key, timestamps] of rateLimitStore.entries()) {
+    const active = timestamps.filter((ts) => ts > windowStart);
+    if (active.length === 0) {
+      rateLimitStore.delete(key);
+    } else {
+      rateLimitStore.set(key, active);
+    }
+  }
+  while (rateLimitStore.size > MAX_RATE_LIMIT_ENTRIES) {
+    const oldestKey = rateLimitStore.keys().next().value;
+    if (oldestKey === undefined) break;
+    rateLimitStore.delete(oldestKey);
+  }
+}
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const windowStart = now - WINDOW_MS;
+  pruneExpiredRateLimits(now);
+
+  const recent = (rateLimitStore.get(ip) ?? []).filter((ts) => ts > windowStart);
+
+  if (recent.length >= MAX_REQUESTS) {
+    rateLimitStore.set(ip, recent);
+    return true;
+  }
+
+  recent.push(now);
+  rateLimitStore.set(ip, recent);
+  return false;
+}
+
+function isAllowedOrigin(headerValue: string): boolean {
+  try {
+    const parsedOrigin = new URL(headerValue);
+    if (parsedOrigin.protocol !== 'https:') {
+      return false;
+    }
+
+    const configuredSiteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL || 'https://www.orionyouth.eu';
+    let configuredOrigin = 'https://www.orionyouth.eu';
+    try {
+      configuredOrigin = new URL(configuredSiteUrl).origin;
+    } catch {
+      configuredOrigin = 'https://www.orionyouth.eu';
+    }
+
+    const allowedOrigins = new Set([
+      'https://orionyouth.eu',
+      'https://www.orionyouth.eu',
+      configuredOrigin,
+    ]);
+
+    return allowedOrigins.has(parsedOrigin.origin);
+  } catch {
+    return false;
+  }
 }
 
 function generateId(prefix: string): string {
@@ -69,6 +159,29 @@ function formatEmailPayload(body: ContactApiPayload, kind: 'contact' | 'partner'
 }
 
 export async function POST(request: Request) {
+  if (process.env.NODE_ENV === 'production') {
+    const originHeader =
+      request.headers.get('origin') ?? request.headers.get('referer');
+    if (!originHeader || !isAllowedOrigin(originHeader)) {
+      return NextResponse.json(
+        { ok: false, error: 'Forbidden origin.' },
+        { status: 403 }
+      );
+    }
+  }
+
+  const clientIp = extractClientIp(request);
+  if (isRateLimited(clientIp)) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          'Too many requests. Please wait a few minutes or email zeid@orionyouth.eu directly.',
+      },
+      { status: 429 }
+    );
+  }
+
   let body: ContactApiPayload;
   try {
     body = (await request.json()) as ContactApiPayload;
@@ -79,9 +192,16 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!body || typeof body !== 'object') {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return NextResponse.json(
       { ok: false, error: 'Request payload must be a JSON object.' },
+      { status: 400 }
+    );
+  }
+
+  if (typeof body.orion_hp_trap === 'string' && body.orion_hp_trap.trim().length > 0) {
+    return NextResponse.json(
+      { ok: false, error: 'Invalid submission.' },
       { status: 400 }
     );
   }
@@ -96,11 +216,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, errors }, { status: 400 });
   }
 
-  const id = typeof body.id === 'string' && body.id.trim() ? body.id.trim() : generateId(kind);
+  const id = generateId(kind);
   const recipient = ORION_ORG.email;
   const emailContent = formatEmailPayload(body, kind);
 
-  const resendApiKey = process.env.RESEND_API_KEY;
+  const resendApiKey = process.env.RESEND_API_KEY?.trim();
   if (resendApiKey) {
     try {
       const providerResponse = await fetch('https://api.resend.com/emails', {
@@ -116,6 +236,7 @@ export async function POST(request: Request) {
           subject: emailContent.subject,
           text: emailContent.text,
         }),
+        signal: AbortSignal.timeout(8000),
       });
 
       if (!providerResponse.ok) {
@@ -140,13 +261,29 @@ export async function POST(request: Request) {
     }
   }
 
+  if (process.env.NODE_ENV === 'production') {
+    console.warn(
+      '[api/contact] RESEND_API_KEY is not configured in production; rejecting automated relay:',
+      { id, kind, recipient }
+    );
+    return NextResponse.json(
+      {
+        ok: false,
+        code: 'RELAY_NOT_CONFIGURED',
+        recipient,
+        id,
+        error:
+          'Direct automated email relay is currently offline. Please send your prepared message using the direct email button below.',
+      },
+      { status: 503 }
+    );
+  }
+
   // Local / preview fallback when RESEND_API_KEY is not configured
   console.info('[api/contact] Dispatch queued (no RESEND_API_KEY configured):', {
     id,
     kind,
     recipient,
-    subject: emailContent.subject,
-    replyTo: emailContent.replyTo,
   });
 
   return NextResponse.json(

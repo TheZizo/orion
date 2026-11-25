@@ -10,6 +10,22 @@ export const metadata: Metadata = {
   title: 'Privacy & Data Protection',
   description:
     'GDPR privacy notice and data protection practices for Orion Fiatalok Informális Csoportja in Debrecen, Hungary.',
+  alternates: {
+    canonical: '/privacy',
+  },
+  openGraph: {
+    title: 'Privacy & Data Protection — Orion',
+    description:
+      'GDPR privacy notice and data protection practices for Orion Fiatalok Informális Csoportja in Debrecen, Hungary.',
+    url: '/privacy',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Privacy & Data Protection — Orion',
+    description:
+      'GDPR privacy notice and data protection practices for Orion Fiatalok Informális Csoportja in Debrecen, Hungary.',
+  },
 };
 
 export default function PrivacyPage() {
@@ -87,14 +103,20 @@ export default function PrivacyPage() {
                   </h3>
                   <p className="text-sm text-[rgba(11,19,43,0.80)] leading-relaxed">
                     Participant applications for active mobilities are collected through our centralized{' '}
-                    <a
-                      href={ORION_ORG.gatewayPortalUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline hover:text-[#E35619]"
-                    >
-                      Orion Network Gateway Portal (portal.orionyouth.eu)
-                    </a>{' '}
+                    {ORION_ORG.gatewayPortalLive ? (
+                      <a
+                        href={ORION_ORG.gatewayPortalUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline hover:text-[#E35619]"
+                      >
+                        Orion Network Gateway Portal (portal.orionyouth.eu)
+                      </a>
+                    ) : (
+                      <span className="font-medium text-[#0B132B]">
+                        Orion Network Gateway Portal (portal.orionyouth.eu, launching early 2027)
+                      </span>
+                    )}{' '}
                     or designated host-partner registration forms. Selected participants’ mobility records, Youthpass certification details, and travel reimbursement documentation are administered in accordance with Erasmus+ National Agency rules under accredited grant{' '}
                     <span className="font-semibold text-[#0B132B] tabular-nums">
                       {ORION_ORG.grantReference}

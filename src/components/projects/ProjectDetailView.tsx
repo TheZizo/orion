@@ -61,27 +61,27 @@ export function ProjectDetailView({ project }: ProjectDetailViewProps) {
 
       {/* Full-bleed Lead Photo Under Header */}
       {leadPhoto && (
-        <section className="relative w-full aspect-[21/9] min-h-[320px] max-h-[640px] bg-[#0B132B] overflow-hidden border-b border-[rgba(11,19,43,0.10)]">
-          <Image
-            src={leadPhoto.src}
-            alt={leadPhoto.alt || project.title}
-            fill
-            sizes="100vw"
-            className="object-cover"
-            priority
-          />
+        <section className="w-full bg-[#0B132B]">
+          <div className="relative w-full aspect-[16/9] md:aspect-[16/8] min-h-[260px] max-h-[560px] bg-[#0B132B] overflow-hidden">
+            <Image
+              src={leadPhoto.src}
+              alt={leadPhoto.alt || project.title}
+              fill
+              sizes="100vw"
+              className="object-cover object-[50%_38%]"
+              priority
+            />
+          </div>
           {leadPhoto.caption && (
-            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#0B132B]/80 to-transparent p-4 sm:p-6 text-xs text-[rgba(248,249,250,0.85)]">
-              <div className="container-orion">
-                {leadPhoto.caption}
-              </div>
+            <div className="bg-[#0B132B] text-[rgba(248,249,250,0.86)] border-b border-[rgba(248,249,250,0.14)] py-3 text-xs">
+              <div className="container-orion">{leadPhoto.caption}</div>
             </div>
           )}
         </section>
       )}
 
       {/* Daylight Reading Canvas */}
-      <main className="bg-[#F8F9FA] text-[#0B132B] py-16 md:py-24">
+      <div className="bg-[#F8F9FA] text-[#0B132B] py-16 md:py-24">
         <div className="container-orion space-y-16 md:space-y-24">
           {/* 8-col Reading Column */}
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -102,17 +102,17 @@ export function ProjectDetailView({ project }: ProjectDetailViewProps) {
 
             {/* Quick Metadata Column */}
             <div className="lg:col-span-4 border-t lg:border-t-0 lg:border-l border-[rgba(11,19,43,0.10)] lg:pl-8 pt-6 lg:pt-0 space-y-4 text-sm">
-              <h3 className="text-xs font-semibold text-[rgba(11,19,43,0.55)]">
+              <h3 className="text-xs font-semibold text-[rgba(11,19,43,0.68)]">
                 Host information
               </h3>
               <dl className="space-y-3">
                 <div>
-                  <dt className="text-xs text-[rgba(11,19,43,0.55)]">Host country</dt>
+                  <dt className="text-xs text-[rgba(11,19,43,0.68)]">Host country</dt>
                   <dd className="font-medium text-[#0B132B] mt-0.5">{project.country}</dd>
                 </div>
                 {project.slug === 'reforest' && (
                   <div>
-                    <dt className="text-xs text-[rgba(11,19,43,0.55)]">Official project portal</dt>
+                    <dt className="text-xs text-[rgba(11,19,43,0.68)]">Official project portal</dt>
                     <dd className="mt-1">
                       <a
                         href="https://www.agoje.eu/our-projects/reforest"
@@ -162,7 +162,7 @@ export function ProjectDetailView({ project }: ProjectDetailViewProps) {
                   {project.gallery.length} {project.gallery.length === 1 ? 'frame' : 'frames'}
                 </span>
               </div>
-              <PhotoGalleryGrid gallery={project.gallery} />
+              <PhotoGalleryGrid gallery={project.gallery} showProjectAttribution={false} />
             </section>
           )}
 
@@ -216,7 +216,7 @@ export function ProjectDetailView({ project }: ProjectDetailViewProps) {
             </Button>
           </section>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

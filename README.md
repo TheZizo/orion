@@ -8,7 +8,7 @@ Participant applications are routed through the centralized **Orion Network Gate
 
 ## Tech Stack & Build Configuration
 
-- **Framework**: Next.js `16.4.3` (App Router, Turbopack)
+- **Framework**: Next.js `16.4.6` (App Router, Turbopack)
 - **Runtime**: Node.js `>=20`
 - **Build Command**: `npm run build`
 - **Output Directory**: `.next`
@@ -22,14 +22,14 @@ Participant applications are routed through the centralized **Orion Network Gate
 Copy `.env.example` to `.env.local` for local testing, or configure these variables in your hosting provider's dashboard before going live:
 
 ```env
-NEXT_PUBLIC_SITE_URL="https://orionyouth.eu"
+NEXT_PUBLIC_SITE_URL="https://www.orionyouth.eu"
 RESEND_API_KEY="re_..."
-RESEND_FROM_EMAIL="Orion Website <noreply@orionyouth.eu>"
+RESEND_FROM_EMAIL="Orion Website <noreply@send.orionyouth.eu>"
 ```
 
-- `NEXT_PUBLIC_SITE_URL`: Canonical base URL used for `metadataBase`, `sitemap.xml`, `robots.txt`, and OpenGraph social cards.
-- `RESEND_API_KEY`: API key from [Resend](https://resend.com) used by `POST /api/contact` to deliver contact and partnership inquiries directly to `zeid@orionyouth.eu`. When omitted, submissions are validated and logged server-side without external delivery.
-- `RESEND_FROM_EMAIL`: Sender address used by `/api/contact`. Configure SPF/DKIM records for `orionyouth.eu` inside Resend before switching away from `onboarding@resend.dev`.
+- `NEXT_PUBLIC_SITE_URL`: Canonical base URL used for `metadataBase`, `sitemap.xml`, `robots.txt`, and OpenGraph social cards (default: `https://www.orionyouth.eu`).
+- `RESEND_API_KEY`: API key from [Resend](https://resend.com) used by `POST /api/contact` to deliver contact and partnership inquiries directly to `zeid@orionyouth.eu`. When omitted in development/test, submissions are validated and logged server-side; in production, `POST /api/contact` returns `503` (`RELAY_NOT_CONFIGURED`) so the UI falls back cleanly to direct email.
+- `RESEND_FROM_EMAIL`: Sender address used by `/api/contact`. Verify Resend on a dedicated sending subdomain (e.g., `send.orionyouth.eu`) rather than the root domain so existing root Outlook MX records on `orionyouth.eu` are unaffected.
 
 ---
 
@@ -56,5 +56,5 @@ RESEND_FROM_EMAIL="Orion Website <noreply@orionyouth.eu>"
 
 - Add final team portraits, roles, and bios in `src/lib/orionData.ts` and `public/photos/team/`.
 - Add official Organization ID (OID) / Partner Identification Form (PIF) details when finalized.
-- Verify `orionyouth.eu` domain records in Resend so transactional emails arrive reliably at `zeid@orionyouth.eu`.
+- Verify a dedicated sending subdomain (e.g., `send.orionyouth.eu`) in Resend so transactional emails arrive reliably at `zeid@orionyouth.eu` without disturbing root Outlook MX records on `orionyouth.eu`.
 - Security headers (CSP, HSTS, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, `X-Content-Type-Options`, and `poweredByHeader: false`) are enforced globally via `next.config.ts`.

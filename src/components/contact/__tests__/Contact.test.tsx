@@ -222,5 +222,70 @@ describe('Contact Partition Components', () => {
       });
       expect(mailto).toHaveAttribute('href', 'mailto:zeid@orionyouth.eu');
     });
+
+    it('updates email placeholder when switching to partner mode', () => {
+      render(<TwoModeContactForm />);
+
+      const emailInput = screen.getByLabelText(/your email address/i);
+      expect(emailInput).toHaveAttribute('placeholder', 'e.g. bence@example.hu');
+
+      const partnerTab = screen.getByRole('tab', {
+        name: /i represent a partner organization/i,
+      });
+      fireEvent.click(partnerTab);
+
+      expect(emailInput).toHaveAttribute(
+        'placeholder',
+        'e.g. maria.kovacs@youth-ngo.eu'
+      );
+    });
+
+    it('renders contact-direct-email-fallback with preserved mailto link on 503 RELAY_NOT_CONFIGURED', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: false,
+          status: 503,
+          json: async () => ({
+            ok: false,
+            code: 'RELAY_NOT_CONFIGURED',
+            error: 'Relay offline',
+          }),
+        })
+      );
+
+      render(<TwoModeContactForm />);
+
+      const userMessage =
+        'Hi Orion team, I would like to ask about train tickets from Budapest to Lacu Rosu.';
+
+      fireEvent.change(screen.getByLabelText(/your full name/i), {
+        target: { value: 'Bence Varga' },
+      });
+      fireEvent.change(screen.getByLabelText(/your email address/i), {
+        target: { value: 'bence@varga-mail.hu' },
+      });
+      fireEvent.change(screen.getByLabelText(/subject/i), {
+        target: { value: 'Travel reimbursement question' },
+      });
+      fireEvent.change(screen.getByLabelText(/message content/i), {
+        target: { value: userMessage },
+      });
+
+      fireEvent.click(screen.getByRole('button', { name: /send my question/i }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId('contact-direct-email-fallback')
+        ).toBeInTheDocument();
+      });
+
+      const mailtoLink = screen.getByRole('link', {
+        name: /open in email client \(zeid@orionyouth\.eu\)/i,
+      });
+      const href = mailtoLink.getAttribute('href') ?? '';
+      expect(href).toContain('mailto:zeid@orionyouth.eu');
+      expect(decodeURIComponent(href)).toContain(userMessage);
+    });
   });
 });

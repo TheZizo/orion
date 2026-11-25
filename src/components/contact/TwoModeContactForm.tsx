@@ -1,28 +1,61 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ContactMessage, ContactMode } from '@/types/orion';
 import { contactRepository, validateContactMessage } from '@/lib/storage';
 import { Button } from '@/components/ui/Button';
 import { ParticipantFaq } from './ParticipantFaq';
 
 export function TwoModeContactForm() {
-  const [mode, setMode] = useState<ContactMode>('participant');
-  const [formData, setFormData] = useState<Partial<ContactMessage>>({
+  const searchParams = useSearchParams();
+  const paramMode = searchParams?.get('mode') ?? null;
+  const paramSubject = searchParams?.get('subject')?.trim().slice(0, 150) ?? '';
+  const searchKey = `${paramMode ?? ''}|${paramSubject}`;
+
+  const [prevSearchKey, setPrevSearchKey] = useState(searchKey);
+  const [mode, setMode] = useState<ContactMode>(() =>
+    paramMode === 'partner' ? 'partner' : 'participant'
+  );
+  const [formData, setFormData] = useState<Partial<ContactMessage>>(() => ({
     name: '',
     email: '',
-    subject: '',
+    subject: paramSubject,
     message: '',
-  });
+  }));
+  const [website, setWebsite] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedMessage, setSubmittedMessage] = useState<ContactMessage | null>(
     null
   );
+  const [fallbackMessage, setFallbackMessage] = useState<ContactMessage | null>(
+    null
+  );
+  const [copiedFallback, setCopiedFallback] = useState(false);
 
   const participantTabRef = useRef<HTMLButtonElement>(null);
   const partnerTabRef = useRef<HTMLButtonElement>(null);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  if (prevSearchKey !== searchKey) {
+    setPrevSearchKey(searchKey);
+    if (paramMode === 'partner' || paramMode === 'participant') {
+      setMode(paramMode);
+    }
+    if (paramSubject) {
+      setFormData((prev) => ({ ...prev, subject: paramSubject }));
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleModeChange = (newMode: ContactMode) => {
     setMode(newMode);
@@ -66,6 +99,32 @@ export function TwoModeContactForm() {
     return `msg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   };
 
+  const buildMailtoHref = (msg: ContactMessage) => {
+    const subject = encodeURIComponent(msg.subject);
+    const body = encodeURIComponent(
+      `From: ${msg.name} (${msg.email})\nMode: ${msg.mode}\n\n${msg.message}`
+    );
+    return `mailto:zeid@orionyouth.eu?subject=${subject}&body=${body}`;
+  };
+
+  const handleCopyFallback = async () => {
+    if (!fallbackMessage || typeof navigator === 'undefined' || !navigator.clipboard) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(
+        `Subject: ${fallbackMessage.subject}\nFrom: ${fallbackMessage.name} (${fallbackMessage.email})\n\n${fallbackMessage.message}`
+      );
+      setCopiedFallback(true);
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+      copyTimerRef.current = setTimeout(() => setCopiedFallback(false), 2500);
+    } catch {
+      // Clipboard write unavailable
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -84,8 +143,9 @@ export function TwoModeContactForm() {
     }
 
     setIsSubmitting(true);
+    let record: ContactMessage | null = null;
     try {
-      const record: ContactMessage = {
+      record = {
         id: generateId(),
         createdAt: new Date().toISOString(),
         mode,
@@ -95,27 +155,91 @@ export function TwoModeContactForm() {
         message: formData.message!.trim(),
       };
 
-      await contactRepository.save(record);
+      try {
+        await contactRepository.save(record);
+      } catch (storageErr) {
+        console.warn('[TwoModeContactForm] Local storage persistence skipped:', storageErr);
+      }
+
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kind: 'contact', ...record }),
+        body: JSON.stringify({ kind: 'contact', ...record, orion_hp_trap: website }),
       });
-      if (!response.ok) {
-        throw new Error(`Dispatch failed with status ${response.status}`);
+
+      let data: {
+        ok?: boolean;
+        code?: string;
+        error?: string;
+        errors?: Record<string, string>;
+      } | null = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
       }
+
+      if (response.status === 400 && data?.errors) {
+        setErrors(data.errors);
+        const firstKey = Object.keys(data.errors)[0];
+        const el = document.getElementById(`contact-${firstKey}`);
+        if (el) el.focus();
+        return;
+      }
+
+      if (response.status === 400) {
+        setErrors({
+          form: data?.error || 'Please check your entries and try again.',
+        });
+        return;
+      }
+
+      if (response.status === 429) {
+        setErrors({
+          form:
+            data?.error ||
+            'Too many requests. Please wait a few minutes or email zeid@orionyouth.eu directly.',
+        });
+        return;
+      }
+
+      if (
+        (response.status === 503 && data?.code === 'RELAY_NOT_CONFIGURED') ||
+        response.status === 502
+      ) {
+        setFallbackMessage(record);
+        setErrors({});
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.error || `Dispatch failed with status ${response.status}`);
+      }
+
       setSubmittedMessage(record);
       setErrors({});
     } catch (err) {
       console.error('[TwoModeContactForm] Submission failed:', err);
-      setErrors({ form: 'An unexpected error occurred. Please try again.' });
+      if (record) {
+        setFallbackMessage(record);
+        setErrors({});
+      } else {
+        setErrors({ form: 'An unexpected error occurred. Please try again.' });
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleReset = () => {
+    if (copyTimerRef.current) {
+      clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = null;
+    }
     setSubmittedMessage(null);
+    setFallbackMessage(null);
+    setCopiedFallback(false);
+    setWebsite('');
     setFormData({
       name: '',
       email: '',
@@ -186,7 +310,57 @@ export function TwoModeContactForm() {
       >
         {/* Form Column (7 cols) */}
         <div className="lg:col-span-7">
-          {submittedMessage ? (
+          {fallbackMessage ? (
+            <div
+              data-testid="contact-direct-email-fallback"
+              className="border border-[rgba(11,19,43,0.15)] bg-white p-8 md:p-12 space-y-6"
+            >
+              <div className="border-b border-[rgba(11,19,43,0.10)] pb-4">
+                <span className="text-xs font-semibold text-[#0B132B] tabular-nums">
+                  Message preserved locally (Ref: {fallbackMessage.id.slice(0, 8)})
+                </span>
+                <h3 className="type-h2 text-[#0B132B] mt-1">
+                  Automated relay is temporarily offline
+                </h3>
+              </div>
+
+              <p className="type-body text-[rgba(11,19,43,0.82)] leading-relaxed">
+                Your message was saved safely so nothing was lost. Send it directly
+                via your email client to{' '}
+                <strong className="text-[#0B132B]">zeid@orionyouth.eu</strong> or copy
+                the text below.
+              </p>
+
+              <div className="border border-[rgba(11,19,43,0.14)] bg-[#F8F9FA] p-5 space-y-2 text-sm">
+                <div className="text-[#0B132B] font-medium">
+                  Subject: {fallbackMessage.subject}
+                </div>
+                <p className="text-[rgba(11,19,43,0.8)] whitespace-pre-line pt-2 border-t border-[rgba(11,19,43,0.08)]">
+                  {fallbackMessage.message}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <a
+                  href={buildMailtoHref(fallbackMessage)}
+                  className="inline-flex items-center justify-center bg-[#e35619] text-[#0B132B] font-display font-semibold text-sm px-6 py-3.5 rounded-none hover:bg-[#d04b12] transition-colors"
+                >
+                  Open in email client (zeid@orionyouth.eu)
+                </a>
+                <Button
+                  variant="secondary"
+                  tone="light"
+                  type="button"
+                  onClick={handleCopyFallback}
+                >
+                  {copiedFallback ? 'Copied message' : 'Copy message'}
+                </Button>
+                <Button variant="secondary" tone="light" onClick={handleReset}>
+                  Edit or write another
+                </Button>
+              </div>
+            </div>
+          ) : submittedMessage ? (
             <div
               data-testid="contact-submission-success"
               className="border border-[rgba(11,19,43,0.15)] p-8 md:p-12 space-y-6"
@@ -240,8 +414,19 @@ export function TwoModeContactForm() {
             <form
               onSubmit={handleSubmit}
               noValidate
-              className="border border-[rgba(11,19,43,0.15)] p-6 md:p-10 space-y-6"
+              className="border border-[rgba(11,19,43,0.15)] bg-white p-6 md:p-10 space-y-6"
             >
+              <input
+                type="text"
+                name="orion_hp_trap"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                tabIndex={-1}
+                autoComplete="new-password"
+                aria-hidden="true"
+                className="sr-only"
+              />
+
               {/* Context header matching active mode */}
               <div className="border-b border-[rgba(11,19,43,0.10)] pb-5">
                 {mode === 'participant' ? (
@@ -278,7 +463,7 @@ export function TwoModeContactForm() {
               {errors.form && (
                 <div
                   role="alert"
-                  className="p-4 border-l-2 border-[#0B132B] bg-[rgba(11,19,43,0.05)] text-[#0B132B] text-sm font-semibold"
+                  className="p-4 border-l-2 border-[#B91C1C] bg-[#FEF2F2] text-[#B91C1C] text-sm font-semibold"
                 >
                   {errors.form}
                 </div>
@@ -291,7 +476,7 @@ export function TwoModeContactForm() {
                   className="block font-medium text-sm text-[#0B132B] mb-2"
                 >
                   {mode === 'participant' ? 'Your full name' : 'Contact person & title'}{' '}
-                  <span className="text-[#e35619]">*</span>
+                  <span className="text-[#B93E0A]">*</span>
                 </label>
                 <input
                   type="text"
@@ -307,16 +492,16 @@ export function TwoModeContactForm() {
                       ? 'e.g. Bence Varga'
                       : 'e.g. Dr. Maria Kovács, Head of Projects'
                   }
-                  className={`w-full h-12 px-3 bg-transparent border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                  className={`w-full h-12 px-3 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
                     errors.name
-                      ? 'border-[#0B132B]'
-                      : 'border-[rgba(11,19,43,0.20)]'
+                      ? 'border-[#B91C1C]'
+                      : 'border-[rgba(11,19,43,0.26)]'
                   }`}
                 />
                 {errors.name && (
                   <p
                     id="err-name"
-                    className="mt-1.5 border-l-2 border-[#0B132B] pl-2 text-xs font-semibold text-[#0B132B]"
+                    className="mt-1.5 border-l-2 border-[#B91C1C] pl-2 text-xs font-semibold text-[#B91C1C]"
                   >
                     {errors.name}
                   </p>
@@ -329,7 +514,7 @@ export function TwoModeContactForm() {
                   htmlFor="contact-email"
                   className="block font-medium text-sm text-[#0B132B] mb-2"
                 >
-                  Your email address <span className="text-[#e35619]">*</span>
+                  Your email address <span className="text-[#B93E0A]">*</span>
                 </label>
                 <input
                   type="email"
@@ -340,17 +525,21 @@ export function TwoModeContactForm() {
                   aria-required="true"
                   aria-invalid={Boolean(errors.email)}
                   aria-describedby={errors.email ? 'err-email' : undefined}
-                  placeholder="e.g. bence@example.hu"
-                  className={`w-full h-12 px-3 bg-transparent border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                  placeholder={
+                    mode === 'participant'
+                      ? 'e.g. bence@example.hu'
+                      : 'e.g. maria.kovacs@youth-ngo.eu'
+                  }
+                  className={`w-full h-12 px-3 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
                     errors.email
-                      ? 'border-[#0B132B]'
-                      : 'border-[rgba(11,19,43,0.20)]'
+                      ? 'border-[#B91C1C]'
+                      : 'border-[rgba(11,19,43,0.26)]'
                   }`}
                 />
                 {errors.email && (
                   <p
                     id="err-email"
-                    className="mt-1.5 border-l-2 border-[#0B132B] pl-2 text-xs font-semibold text-[#0B132B]"
+                    className="mt-1.5 border-l-2 border-[#B91C1C] pl-2 text-xs font-semibold text-[#B91C1C]"
                   >
                     {errors.email}
                   </p>
@@ -363,7 +552,7 @@ export function TwoModeContactForm() {
                   htmlFor="contact-subject"
                   className="block font-medium text-sm text-[#0B132B] mb-2"
                 >
-                  Subject <span className="text-[#e35619]">*</span>
+                  Subject <span className="text-[#B93E0A]">*</span>
                 </label>
                 <input
                   type="text"
@@ -379,16 +568,16 @@ export function TwoModeContactForm() {
                       ? 'e.g. Question about travel reimbursement for Portugal'
                       : 'e.g. KA210 Small-scale partnership mandate invitation'
                   }
-                  className={`w-full h-12 px-3 bg-transparent border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                  className={`w-full h-12 px-3 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
                     errors.subject
-                      ? 'border-[#0B132B]'
-                      : 'border-[rgba(11,19,43,0.20)]'
+                      ? 'border-[#B91C1C]'
+                      : 'border-[rgba(11,19,43,0.26)]'
                   }`}
                 />
                 {errors.subject && (
                   <p
                     id="err-subject"
-                    className="mt-1.5 border-l-2 border-[#0B132B] pl-2 text-xs font-semibold text-[#0B132B]"
+                    className="mt-1.5 border-l-2 border-[#B91C1C] pl-2 text-xs font-semibold text-[#B91C1C]"
                   >
                     {errors.subject}
                   </p>
@@ -401,7 +590,7 @@ export function TwoModeContactForm() {
                   htmlFor="contact-message"
                   className="block font-medium text-sm text-[#0B132B] mb-2"
                 >
-                  Message content <span className="text-[#e35619]">*</span>
+                  Message content <span className="text-[#B93E0A]">*</span>
                 </label>
                 <textarea
                   id="contact-message"
@@ -417,21 +606,21 @@ export function TwoModeContactForm() {
                       ? 'Tell us what you are wondering about! Are you nervous about speaking English, or curious about the venue?'
                       : 'Please outline your inquiry, partner profile, or collaboration objectives.'
                   }
-                  className={`w-full p-3 bg-transparent border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                  className={`w-full p-3 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
                     errors.message
-                      ? 'border-[#0B132B]'
-                      : 'border-[rgba(11,19,43,0.20)]'
+                      ? 'border-[#B91C1C]'
+                      : 'border-[rgba(11,19,43,0.26)]'
                   }`}
                 />
                 {errors.message && (
                   <p
                     id="err-message"
-                    className="mt-1.5 border-l-2 border-[#0B132B] pl-2 text-xs font-semibold text-[#0B132B]"
+                    className="mt-1.5 border-l-2 border-[#B91C1C] pl-2 text-xs font-semibold text-[#B91C1C]"
                   >
                     {errors.message}
                   </p>
                 )}
-                <p className="mt-1 text-xs text-[rgba(11,19,43,0.55)]">
+                <p className="mt-1 text-xs text-[rgba(11,19,43,0.68)]">
                   Minimum 10 characters required. Maximum 3,000 characters.
                 </p>
               </div>
@@ -455,7 +644,7 @@ export function TwoModeContactForm() {
           {/* HQ Contact Ledger Block */}
           <div className="border border-[rgba(11,19,43,0.15)] p-6 md:p-8 space-y-5">
             <div className="border-b border-[rgba(11,19,43,0.08)] pb-4">
-              <span className="text-xs font-medium text-[rgba(11,19,43,0.55)]">
+              <span className="text-xs font-medium text-[rgba(11,19,43,0.68)]">
                 Permanent Anchor
               </span>
               <h4 className="type-h3 text-[#0B132B] mt-1">Orion Headquarters</h4>
@@ -463,7 +652,7 @@ export function TwoModeContactForm() {
 
             <dl className="space-y-4 text-sm">
               <div>
-                <dt className="text-xs font-semibold text-[rgba(11,19,43,0.55)]">
+                <dt className="text-xs font-semibold text-[rgba(11,19,43,0.68)]">
                   Location
                 </dt>
                 <dd className="mt-1 space-y-1.5">
@@ -474,7 +663,7 @@ export function TwoModeContactForm() {
               </div>
 
               <div>
-                <dt className="text-xs text-[rgba(11,19,43,0.55)] font-semibold">
+                <dt className="text-xs text-[rgba(11,19,43,0.68)] font-semibold">
                   Direct Dispatch Email
                 </dt>
                 <dd className="mt-1">
@@ -488,7 +677,7 @@ export function TwoModeContactForm() {
               </div>
 
               <div>
-                <dt className="text-xs text-[rgba(11,19,43,0.55)] font-semibold">
+                <dt className="text-xs text-[rgba(11,19,43,0.68)] font-semibold">
                   Response Cadence
                 </dt>
                 <dd className="text-xs text-[rgba(11,19,43,0.7)] mt-0.5 tabular-nums">

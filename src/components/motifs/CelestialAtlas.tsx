@@ -227,10 +227,7 @@ export function CelestialAtlas({
   }, [allNodes, defaultActiveId]);
 
   const [activeNode, setActiveNode] = useState<AtlasNode | null>(initialNode);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  });
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [parallaxOffset, setParallaxOffset] = useState<{ yaw: number; elev: number }>({
     yaw: 0,
     elev: 0,
@@ -295,8 +292,16 @@ export function CelestialAtlas({
     stepRef.current = updatePhysics;
   }, [updatePhysics]);
 
+  const isReducedMotionActive = useCallback(() => {
+    if (prefersReducedMotion) return true;
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+    return false;
+  }, [prefersReducedMotion]);
+
   const startLoop = useCallback(() => {
-    if (prefersReducedMotion) return;
+    if (isReducedMotionActive()) return;
     if (!isRunningRef.current) {
       isRunningRef.current = true;
       if (typeof window !== 'undefined' && process.env.NODE_ENV === 'test') {
@@ -305,11 +310,11 @@ export function CelestialAtlas({
         rafIdRef.current = requestAnimationFrame(() => stepRef.current());
       }
     }
-  }, [updatePhysics, prefersReducedMotion]);
+  }, [updatePhysics, isReducedMotionActive]);
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
-      if (prefersReducedMotion || !containerRef.current) return;
+      if (isReducedMotionActive() || !containerRef.current) return;
 
       const rect = containerRef.current.getBoundingClientRect();
       const width = rect && rect.width > 0 ? rect.width : 440;
@@ -327,21 +332,23 @@ export function CelestialAtlas({
 
       startLoop();
     },
-    [prefersReducedMotion, startLoop]
+    [isReducedMotionActive, startLoop]
   );
 
   const handlePointerLeave = useCallback(() => {
-    if (prefersReducedMotion) return;
+    if (isReducedMotionActive()) return;
 
     targetOffsetRef.current = { yaw: 0, elev: 0 };
     startLoop();
-  }, [prefersReducedMotion, startLoop]);
+  }, [isReducedMotionActive, startLoop]);
 
   useEffect(() => {
     return () => {
       if (rafIdRef.current) {
         cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
       }
+      isRunningRef.current = false;
     };
   }, []);
 
@@ -418,7 +425,7 @@ export function CelestialAtlas({
   const nodePositionMap = useMemo(() => {
     return {
       'orion-hq': { pos: corePos, labelOffset: { x: 0, y: 28 }, align: 'middle' as const, sub: 'Debrecen, Hungary' },
-      'project-reforest': { pos: orbit01Pos, labelOffset: { x: -18, y: -12 }, align: 'end' as const, sub: 'October 11–22, 2026, Romania' },
+      'project-reforest': { pos: orbit01Pos, labelOffset: { x: -20, y: -18 }, align: 'end' as const, sub: 'October 11–22, 2026, Romania' },
       'call-the-financial-blueprint': { pos: orbit02Pos, labelOffset: { x: 22, y: 2 }, align: 'start' as const, sub: 'March 2027, Hungary' },
       'partner-horizon': { pos: orbit03Pos, labelOffset: { x: 18, y: 14 }, align: 'start' as const, sub: 'Consortium Horizon' },
     };
@@ -440,6 +447,66 @@ export function CelestialAtlas({
     { id: 'call-the-financial-blueprint', label: 'The Financial Blueprint', aria: 'Orbit 02: The Financial Blueprint' },
     { id: 'partner-horizon', label: 'Partner Horizon', aria: 'Orbit 03: Partner Horizon' },
   ];
+
+  const renderNodeLabel = (
+    nodeId: string,
+    data: { labelOffset: { x: number; y: number }; align: 'middle' | 'end' | 'start'; sub: string }
+  ) => {
+    const isBlueprint = nodeId === 'call-the-financial-blueprint';
+    const title =
+      nodeId === 'orion-hq'
+        ? 'Debrecen HQ'
+        : nodeId === 'project-reforest'
+          ? 'ReForest ’26'
+          : nodeId === 'call-the-financial-blueprint'
+            ? 'The Financial Blueprint'
+            : 'Partner Horizon';
+
+    const hitX = data.align === 'middle' ? -75 : data.align === 'end' ? -170 : -6;
+    const hitWidth = data.align === 'middle' ? 150 : data.align === 'end' ? 176 : 190;
+
+    return (
+      <g transform={`translate(${data.labelOffset.x}, ${data.labelOffset.y})`}>
+        <rect
+          x={hitX}
+          y="-15"
+          width={hitWidth}
+          height="36"
+          fill="transparent"
+          aria-hidden="true"
+        />
+        <text
+          x="0"
+          y="0"
+          textAnchor={data.align}
+          fill="#F8F9FA"
+          fontSize={isBlueprint ? '14.5' : '13.5'}
+          fontFamily="var(--font-display), sans-serif"
+          fontWeight={isBlueprint ? '700' : '600'}
+          paintOrder="stroke"
+          stroke="#0B132B"
+          strokeWidth="4"
+          strokeLinejoin="round"
+        >
+          {title}
+        </text>
+        <text
+          x="0"
+          y="15"
+          textAnchor={data.align}
+          fill="rgba(248,249,250,0.65)"
+          fontSize="11"
+          fontFamily="var(--font-body), sans-serif"
+          paintOrder="stroke"
+          stroke="#0B132B"
+          strokeWidth="4"
+          strokeLinejoin="round"
+        >
+          {data.sub}
+        </text>
+      </g>
+    );
+  };
 
   return (
     <div className={`w-full flex flex-col gap-6 items-stretch ${className}`.trim()}>
@@ -541,6 +608,7 @@ export function CelestialAtlas({
           {/* 4. Core Anchor: Debrecen Sun (physically inside the system) */}
           {(() => {
             const hqNode = allNodes.find((n) => n.id === 'orion-hq') ?? allNodes[0];
+            const hqData = nodePositionMap['orion-hq'];
             const isSelected = activeNode?.id === hqNode.id;
 
             return (
@@ -588,11 +656,13 @@ export function CelestialAtlas({
                 <g transform="translate(-13, -13)">
                   <SparkleStar size={26} color="#F8F9FA" />
                 </g>
+
+                {renderNodeLabel(hqNode.id, hqData)}
               </g>
             );
           })()}
 
-          {/* 5. Orbital Nodes (Unified Layer) */}
+          {/* 5. Orbital Nodes (Unified Layer with Clickable Typography Labels) */}
           {allNodes.map((node) => {
             if (node.id === 'orion-hq') return null;
             const data = nodePositionMap[node.id as keyof typeof nodePositionMap];
@@ -662,55 +732,11 @@ export function CelestialAtlas({
                     </g>
                   </g>
                 )}
+
+                {renderNodeLabel(node.id, data)}
               </g>
             );
           })}
-
-          {/* 8. Quiet Floating Typography Labels (No boxes, no middle-dots, Space Grotesk) */}
-          <g pointerEvents="none">
-            {allNodes.map((node) => {
-              const data = nodePositionMap[node.id as keyof typeof nodePositionMap];
-              if (!data) return null;
-              const isBlueprint = node.id === 'call-the-financial-blueprint';
-              const title =
-                node.id === 'orion-hq'
-                  ? 'Debrecen HQ'
-                  : node.id === 'project-reforest'
-                    ? 'ReForest ’26'
-                    : node.id === 'call-the-financial-blueprint'
-                      ? 'The Financial Blueprint'
-                      : 'Partner Horizon';
-
-              return (
-                <g
-                  key={`label-${node.id}`}
-                  transform={`translate(${data.pos.x + data.labelOffset.x}, ${data.pos.y + data.labelOffset.y})`}
-                >
-                  <text
-                    x="0"
-                    y="0"
-                    textAnchor={data.align}
-                    fill="#F8F9FA"
-                    fontSize={isBlueprint ? '12.5' : '11.5'}
-                    fontFamily="Space Grotesk, sans-serif"
-                    fontWeight={isBlueprint ? '700' : '600'}
-                  >
-                    {title}
-                  </text>
-                  <text
-                    x="0"
-                    y="13"
-                    textAnchor={data.align}
-                    fill="rgba(248,249,250,0.60)"
-                    fontSize="10"
-                    fontFamily="Inter, sans-serif"
-                  >
-                    {data.sub}
-                  </text>
-                </g>
-              );
-            })}
-          </g>
         </svg>
 
         {/* Quiet Caption: Text Tabs Row + Editorial NodeInspector */}

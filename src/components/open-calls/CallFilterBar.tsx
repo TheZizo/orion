@@ -147,7 +147,7 @@ export function CallFilterBar({
           Showing {filteredCount} of {totalCount} open calls
         </span>
         {isFiltered && (
-          <span className="text-[12px] text-[rgba(11,19,43,0.55)]">
+          <span className="text-[12px] text-[rgba(11,19,43,0.68)]">
             Filtered by {[currentType !== 'all' && currentType, currentCountry !== 'all' && currentCountry, currentStatus !== 'all' && currentStatus].filter(Boolean).join(', ')}
           </span>
         )}

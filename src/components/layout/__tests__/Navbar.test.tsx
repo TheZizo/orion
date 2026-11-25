@@ -72,4 +72,20 @@ describe('Navbar component', () => {
     expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
     expect(document.getElementById('mobile-menu')).toBeNull();
   });
+
+  it('locks document.body.style.overflow when mobile drawer opens and resets when closed', () => {
+    document.body.style.overflow = '';
+    render(<Navbar />);
+
+    const toggleButton = screen.getByRole('button', {
+      name: /open navigation menu/i,
+    });
+    expect(document.body.style.overflow).toBe('');
+
+    fireEvent.click(toggleButton);
+    expect(document.body.style.overflow).toBe('hidden');
+
+    fireEvent.click(toggleButton);
+    expect(document.body.style.overflow).toBe('');
+  });
 });

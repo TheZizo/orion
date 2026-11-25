@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { GalleryItem } from '@/types/orion';
@@ -8,11 +8,20 @@ import { GalleryItem } from '@/types/orion';
 export interface PhotoGalleryGridProps {
   gallery: GalleryItem[];
   className?: string;
+  showProjectAttribution?: boolean;
 }
 
-export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridProps) {
+export function PhotoGalleryGrid({
+  gallery,
+  className = '',
+  showProjectAttribution = true,
+}: PhotoGalleryGridProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeLightboxIndex, setActiveLightboxIndex] = useState<number | null>(null);
+  const triggerElementRef = useRef<HTMLElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const wasOpenRef = useRef(false);
 
   // Extract unique categories present in the gallery items
   const categories = useMemo(() => {
@@ -29,9 +38,26 @@ export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridPr
     return gallery.filter((item) => item.category === selectedCategory);
   }, [gallery, selectedCategory]);
 
-  // Keyboard navigation & escape listener for lightbox
+  const effectiveLightboxIndex =
+    activeLightboxIndex !== null && activeLightboxIndex < displayedItems.length
+      ? activeLightboxIndex
+      : null;
+
+  // Keyboard navigation, focus trap, and escape listener for lightbox
   useEffect(() => {
-    if (activeLightboxIndex === null) return;
+    if (effectiveLightboxIndex === null) {
+      if (wasOpenRef.current) {
+        wasOpenRef.current = false;
+        triggerElementRef.current?.focus();
+        triggerElementRef.current = null;
+      }
+      return;
+    }
+
+    if (!wasOpenRef.current) {
+      wasOpenRef.current = true;
+      closeButtonRef.current?.focus();
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -46,23 +72,44 @@ export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridPr
             ? null
             : (prev - 1 + displayedItems.length) % displayedItems.length
         );
+      } else if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = Array.from(
+          dialogRef.current.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (!dialogRef.current.contains(document.activeElement)) {
+          e.preventDefault();
+          first.focus();
+          return;
+        }
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeLightboxIndex, displayedItems.length]);
+  }, [effectiveLightboxIndex, displayedItems.length]);
 
   // Lock body scroll while lightbox is open
   useEffect(() => {
-    if (activeLightboxIndex !== null) {
+    if (effectiveLightboxIndex !== null) {
       const prevOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
       return () => {
         document.body.style.overflow = prevOverflow;
       };
     }
-  }, [activeLightboxIndex]);
+  }, [effectiveLightboxIndex]);
 
   if (!gallery || gallery.length === 0) {
     return null;
@@ -90,8 +137,8 @@ export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridPr
   };
 
   const activeItem =
-    activeLightboxIndex !== null && displayedItems[activeLightboxIndex]
-      ? displayedItems[activeLightboxIndex]
+    effectiveLightboxIndex !== null && displayedItems[effectiveLightboxIndex]
+      ? displayedItems[effectiveLightboxIndex]
       : null;
 
   return (
@@ -154,10 +201,14 @@ export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridPr
                 role="button"
                 tabIndex={0}
                 aria-label={`Inspect photo: ${item.caption || item.alt}`}
-                onClick={() => setActiveLightboxIndex(index)}
+                onClick={(e) => {
+                  triggerElementRef.current = e.currentTarget;
+                  setActiveLightboxIndex(index);
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
+                    triggerElementRef.current = e.currentTarget;
                     setActiveLightboxIndex(index);
                   }
                 }}
@@ -227,7 +278,7 @@ export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridPr
               )}
 
               {/* Project attribution link if provided */}
-              {item.projectTitle && item.projectSlug && (
+              {showProjectAttribution && item.projectTitle && item.projectSlug && (
                 <p className="text-xs text-[rgba(11,19,43,0.55)]">
                   <Link
                     href={`/projects/${item.projectSlug}`}
@@ -245,6 +296,7 @@ export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridPr
       {/* Interactive Lightbox Modal */}
       {activeItem && activeLightboxIndex !== null && (
         <div
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-label="Photo lightbox"
@@ -257,7 +309,7 @@ export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridPr
             onClick={(e) => e.stopPropagation()}
           >
             {/* Frame Counter in tabular nums */}
-            <div className="text-xs text-[rgba(248,249,250,0.7)] tabular-nums font-mono tracking-wider">
+            <div className="text-xs text-[rgba(248,249,250,0.7)] tabular-nums font-display tracking-wider">
               {String(activeLightboxIndex + 1).padStart(2, '0')} /{' '}
               {String(displayedItems.length).padStart(2, '0')}
             </div>
@@ -271,6 +323,7 @@ export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridPr
 
             {/* Close Button */}
             <button
+              ref={closeButtonRef}
               type="button"
               aria-label="Close dialog"
               onClick={() => setActiveLightboxIndex(null)}
@@ -295,7 +348,7 @@ export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridPr
 
           {/* Main Stage: Previous Button, Centered High-Res Image, Next Button */}
           <div
-            className="relative flex-1 flex items-center justify-between gap-2 sm:gap-4 my-4 max-h-[68vh]"
+            className="relative flex-1 flex items-center justify-between gap-2 sm:gap-4 my-4 max-h-[68vh] max-sm:pb-14"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -307,7 +360,7 @@ export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridPr
                     displayedItems.length
                 )
               }
-              className="z-10 p-3 text-[#F8F9FA] border border-[rgba(248,249,250,0.2)] bg-[#0B132B]/60 hover:bg-[rgba(248,249,250,0.15)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA] cursor-pointer shrink-0"
+              className="z-10 p-3 text-[#F8F9FA] border border-[rgba(248,249,250,0.2)] bg-[#0B132B]/60 hover:bg-[rgba(248,249,250,0.15)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA] cursor-pointer shrink-0 max-sm:absolute max-sm:bottom-0 max-sm:left-0"
             >
               <svg
                 width="22"
@@ -349,7 +402,7 @@ export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridPr
                   (activeLightboxIndex + 1) % displayedItems.length
                 )
               }
-              className="z-10 p-3 text-[#F8F9FA] border border-[rgba(248,249,250,0.2)] bg-[#0B132B]/60 hover:bg-[rgba(248,249,250,0.15)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA] cursor-pointer shrink-0"
+              className="z-10 p-3 text-[#F8F9FA] border border-[rgba(248,249,250,0.2)] bg-[#0B132B]/60 hover:bg-[rgba(248,249,250,0.15)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA] cursor-pointer shrink-0 max-sm:absolute max-sm:bottom-0 max-sm:right-0"
             >
               <svg
                 width="22"
@@ -384,15 +437,17 @@ export function PhotoGalleryGrid({ gallery, className = '' }: PhotoGalleryGridPr
               {activeItem.photographer && (
                 <span>Photo: {activeItem.photographer}</span>
               )}
-              {activeItem.projectSlug && activeItem.projectTitle && (
-                <Link
-                  href={`/projects/${activeItem.projectSlug}`}
-                  onClick={() => setActiveLightboxIndex(null)}
-                  className="text-[#F8F9FA] underline hover:text-[#e35619] transition-colors"
-                >
-                  View project: {activeItem.projectTitle}
-                </Link>
-              )}
+              {showProjectAttribution &&
+                activeItem.projectSlug &&
+                activeItem.projectTitle && (
+                  <Link
+                    href={`/projects/${activeItem.projectSlug}`}
+                    onClick={() => setActiveLightboxIndex(null)}
+                    className="text-[#F8F9FA] underline hover:text-[#e35619] transition-colors"
+                  >
+                    View project: {activeItem.projectTitle}
+                  </Link>
+                )}
             </div>
           </div>
         </div>

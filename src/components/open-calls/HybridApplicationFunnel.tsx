@@ -2,6 +2,7 @@ import React from 'react';
 import { ExternalLink } from 'lucide-react';
 import { OpenCall } from '@/types/orion';
 import { ORION_ORG } from '@/lib/orionData';
+import { isSafeHttpsUrl } from '@/lib/storage';
 import { ExternalApplicationCard } from './ExternalApplicationCard';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -48,6 +49,19 @@ export function HybridApplicationFunnel({
 
   if (call.status === 'Opening soon') {
     const venueLabel = call.venue ? call.venue : 'Location TBA';
+    const earlyInterestHref = `/contact?mode=participant&subject=${encodeURIComponent(
+      `Early interest: ${call.title}`
+    )}`;
+    const parsedStart = call.startDate ? new Date(`${call.startDate}T00:00:00Z`) : null;
+    const startMonthLabel =
+      parsedStart && !Number.isNaN(parsedStart.getTime())
+        ? parsedStart.toLocaleDateString('en-US', {
+            month: 'long',
+            year: 'numeric',
+            timeZone: 'UTC',
+          })
+        : 'March 2027';
+
     return (
       <div className={`space-y-6 ${className}`.trim()}>
         <div className="border border-[rgba(11,19,43,0.12)] bg-white p-8 md:p-10 space-y-4">
@@ -65,30 +79,36 @@ export function HybridApplicationFunnel({
           <p className="type-body text-[#0B132B]/80 max-w-2xl leading-relaxed">
             <strong className="text-[#0B132B] font-semibold">{call.title}</strong> will take place in{' '}
             <strong className="text-[#0B132B] font-semibold">
-              {call.country} ({venueLabel}) in March 2027
+              {call.country} ({venueLabel}) in {startMonthLabel}
             </strong>
-            . Official call documentation and final participant selection criteria will be published in early 2027.
+            . Official call documentation and final participant selection criteria will be published ahead of opening.
           </p>
 
           <p className="type-caption text-[#0B132B]/70 max-w-2xl">
-            Participant applications across Orion will open through the centralized{' '}
-            <strong className="text-[#0B132B]">Orion Network Gateway Portal</strong>. In the meantime, you can preview the portal or reach out with any questions.
+            Participant applications across Orion will open on the{' '}
+            {ORION_ORG.gatewayPortalLive ? (
+              <a
+                href={ORION_ORG.gatewayPortalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-[#0B132B] underline hover:text-[#e35619]"
+              >
+                Orion Network Gateway Portal
+              </a>
+            ) : (
+              <strong className="text-[#0B132B]">
+                Orion Network Gateway Portal (launching early 2027)
+              </strong>
+            )}
+            . Register early interest below or reach out with any questions.
           </p>
 
           <div className="pt-2 flex flex-wrap items-center gap-4">
-            <Button
-              variant="primary"
-              tone="light"
-              href={ORION_ORG.gatewayPortalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span>Network Gateway Portal (coming soon)</span>
-              <ExternalLink className="w-4 h-4 ml-2" aria-hidden="true" />
-              <span className="sr-only">(opens in a new tab)</span>
+            <Button variant="primary" tone="light" href={earlyInterestHref}>
+              Register early interest
             </Button>
 
-            <Button variant="ghost" tone="light" href="/contact">
+            <Button variant="secondary" tone="light" href="/contact">
               Ask a question about this call
             </Button>
           </div>
@@ -101,7 +121,18 @@ export function HybridApplicationFunnel({
     return <ExternalApplicationCard call={call} className={className} />;
   }
 
-  const portalUrl = call.externalFormUrl?.trim() || ORION_ORG.gatewayPortalUrl;
+  const customExternalUrl = call.externalFormUrl?.trim();
+  const safeCustomExternalUrl = isSafeHttpsUrl(customExternalUrl)
+    ? customExternalUrl
+    : '';
+  const portalUrl =
+    safeCustomExternalUrl ||
+    (ORION_ORG.gatewayPortalLive && isSafeHttpsUrl(ORION_ORG.gatewayPortalUrl)
+      ? ORION_ORG.gatewayPortalUrl
+      : '');
+  const applicationInquiryHref = `/contact?mode=participant&subject=${encodeURIComponent(
+    `Application inquiry: ${call.title}`
+  )}`;
 
   return (
     <div
@@ -122,18 +153,29 @@ export function HybridApplicationFunnel({
       </div>
 
       <div className="pt-4 border-t border-[rgba(11,19,43,0.08)] flex flex-col sm:flex-row sm:items-center gap-4">
-        <Button
-          variant="primary"
-          tone="light"
-          href={portalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full sm:w-auto"
-        >
-          <span>Open Network Gateway Portal</span>
-          <ExternalLink className="w-4 h-4 ml-2" aria-hidden="true" />
-          <span className="sr-only">(opens in a new tab)</span>
-        </Button>
+        {portalUrl ? (
+          <Button
+            variant="primary"
+            tone="light"
+            href={portalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto"
+          >
+            <span>Open Network Gateway Portal</span>
+            <ExternalLink className="w-4 h-4 ml-2" aria-hidden="true" />
+            <span className="sr-only">(opens in a new tab)</span>
+          </Button>
+        ) : (
+          <Button
+            variant="primary"
+            tone="light"
+            href={applicationInquiryHref}
+            className="w-full sm:w-auto"
+          >
+            Submit application inquiry
+          </Button>
+        )}
 
         <p className="type-caption text-[#0B132B]/60">
           Questions before applying? Email{' '}

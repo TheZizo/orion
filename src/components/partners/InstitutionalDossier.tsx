@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { PartnerInquiry } from '@/types/orion';
-import { partnerInquiryRepository } from '@/lib/storage';
+import { partnerInquiryRepository, validatePartnerInquiry } from '@/lib/storage';
 import { Button } from '@/components/ui/Button';
 
 interface PartnerFormState {
@@ -23,40 +23,23 @@ const INITIAL_FORM_STATE: PartnerFormState = {
   message: '',
 };
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function validatePartnerEmailForm(data: PartnerFormState): Record<string, string> {
-  const errors: Record<string, string> = {};
-
-  if (!data.organizationName.trim()) {
-    errors.organizationName = 'Organization name is required.';
-  }
-  if (!data.country.trim()) {
-    errors.country = 'Country is required.';
-  }
-  if (!data.contactPerson.trim()) {
-    errors.contactPerson = 'Contact person name is required.';
-  }
-  if (!data.email.trim()) {
-    errors.email = 'Email address is required.';
-  } else if (!EMAIL_REGEX.test(data.email.trim())) {
-    errors.email = 'Please provide a valid email address.';
-  }
-  if (!data.topic.trim()) {
-    errors.topic = 'Partnership topic is required.';
-  }
-  if (!data.message.trim()) {
-    errors.message = 'Please provide details regarding your partnership inquiry.';
-  }
-
-  return errors;
-}
-
 export function InstitutionalDossier() {
   const [formData, setFormData] = useState<PartnerFormState>(INITIAL_FORM_STATE);
+  const [website, setWebsite] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedInquiry, setSubmittedInquiry] = useState<PartnerInquiry | null>(null);
+  const [deliveryMode, setDeliveryMode] = useState<'resend' | 'mailto'>('mailto');
+  const [copiedInquiry, setCopiedInquiry] = useState(false);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -96,10 +79,38 @@ export function InstitutionalDossier() {
     return `mailto:zeid@orionyouth.eu?subject=${subject}&body=${body}`;
   };
 
+  const buildPlaintextInquiry = (inquiry: PartnerInquiry): string =>
+    [
+      `Organisation: ${inquiry.organizationName}`,
+      `Country: ${inquiry.country}`,
+      `Contact Person: ${inquiry.contactPerson}`,
+      `Official Email: ${inquiry.email}`,
+      `Partnership Topic: ${inquiry.topic}`,
+      ``,
+      `Message:`,
+      inquiry.message,
+    ].join('\n');
+
+  const handleCopyInquiry = async () => {
+    if (!submittedInquiry || typeof navigator === 'undefined' || !navigator.clipboard) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(buildPlaintextInquiry(submittedInquiry));
+      setCopiedInquiry(true);
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+      copyTimerRef.current = setTimeout(() => setCopiedInquiry(false), 2500);
+    } catch {
+      // Clipboard write unavailable
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const validationErrors = validatePartnerEmailForm(formData);
+    const validationErrors = validatePartnerInquiry(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       const firstKey = Object.keys(validationErrors)[0];
@@ -109,8 +120,9 @@ export function InstitutionalDossier() {
     }
 
     setIsSubmitting(true);
+    let record: PartnerInquiry | null = null;
     try {
-      const record: PartnerInquiry = {
+      record = {
         id: generateId(),
         createdAt: new Date().toISOString(),
         organizationName: formData.organizationName.trim(),
@@ -122,27 +134,97 @@ export function InstitutionalDossier() {
         message: formData.message.trim(),
       };
 
-      await partnerInquiryRepository.save(record);
+      try {
+        await partnerInquiryRepository.save(record);
+      } catch (storageErr) {
+        console.warn('[InstitutionalDossier] Local storage persistence skipped:', storageErr);
+      }
+
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kind: 'partner', ...record }),
+        body: JSON.stringify({ kind: 'partner', ...record, orion_hp_trap: website }),
       });
-      if (!response.ok) {
-        throw new Error(`Dispatch failed with status ${response.status}`);
+
+      let data: {
+        ok?: boolean;
+        code?: string;
+        delivery?: string;
+        error?: string;
+        errors?: Record<string, string>;
+      } | null = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
       }
-      setSubmittedInquiry(record);
-      setErrors({});
+
+      if (response.status === 400 && data?.errors) {
+        setErrors(data.errors);
+        const firstKey = Object.keys(data.errors)[0];
+        const el = document.getElementById(`partner-${firstKey}`);
+        if (el) el.focus();
+        return;
+      }
+
+      if (response.status === 400) {
+        setErrors({
+          form: data?.error || 'Please check your entries and try again.',
+        });
+        return;
+      }
+
+      if (response.status === 429) {
+        setErrors({
+          form:
+            data?.error ||
+            'Too many requests. Please wait a few minutes or email zeid@orionyouth.eu directly.',
+        });
+        return;
+      }
+
+      if (response.ok && data?.delivery === 'resend') {
+        setDeliveryMode('resend');
+        setSubmittedInquiry(record);
+        setErrors({});
+        return;
+      }
+
+      if (
+        response.status === 503 ||
+        response.status === 502 ||
+        (response.ok && data?.delivery !== 'resend')
+      ) {
+        setDeliveryMode('mailto');
+        setSubmittedInquiry(record);
+        setErrors({});
+        return;
+      }
+
+      throw new Error(data?.error || `Dispatch failed with status ${response.status}`);
     } catch (err) {
       console.error('[InstitutionalDossier] Submission failed:', err);
-      setErrors({ form: 'An unexpected error occurred. Please try again.' });
+      if (record) {
+        setDeliveryMode('mailto');
+        setSubmittedInquiry(record);
+        setErrors({});
+      } else {
+        setErrors({ form: 'An unexpected error occurred. Please try again.' });
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleReset = () => {
+    if (copyTimerRef.current) {
+      clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = null;
+    }
     setSubmittedInquiry(null);
+    setDeliveryMode('mailto');
+    setCopiedInquiry(false);
+    setWebsite('');
     setFormData(INITIAL_FORM_STATE);
     setErrors({});
   };
@@ -186,19 +268,32 @@ export function InstitutionalDossier() {
                   Inquiry recorded, reference {submittedInquiry.id.slice(0, 8)}
                 </span>
                 <h2 className="type-h2 text-[#0B132B] mt-1">
-                  Partnership inquiry ready for dispatch
+                  {deliveryMode === 'resend'
+                    ? 'Partnership inquiry dispatched'
+                    : 'Partnership inquiry ready for dispatch'}
                 </h2>
               </div>
 
-              <p className="type-body text-[rgba(11,19,43,0.85)] leading-relaxed">
-                Thank you, <strong className="text-[#0B132B]">{submittedInquiry.contactPerson}</strong>.
-                Your inquiry on behalf of{' '}
-                <strong className="text-[#0B132B]">{submittedInquiry.organizationName}</strong>{' '}
-                ({submittedInquiry.country}) has been saved. Click below to open your
-                email client with the pre-addressed dispatch to{' '}
-                <strong className="text-[#0B132B]">zeid@orionyouth.eu</strong>, or copy
-                the preview for your records.
-              </p>
+              {deliveryMode === 'resend' ? (
+                <p className="type-body text-[rgba(11,19,43,0.85)] leading-relaxed">
+                  Thank you, <strong className="text-[#0B132B]">{submittedInquiry.contactPerson}</strong>.
+                  Your inquiry on behalf of{' '}
+                  <strong className="text-[#0B132B]">{submittedInquiry.organizationName}</strong>{' '}
+                  ({submittedInquiry.country}) has been delivered directly to{' '}
+                  <strong className="text-[#0B132B]">zeid@orionyouth.eu</strong>. Our
+                  coordination desk typically responds within ~2 business days.
+                </p>
+              ) : (
+                <p className="type-body text-[rgba(11,19,43,0.85)] leading-relaxed">
+                  Thank you, <strong className="text-[#0B132B]">{submittedInquiry.contactPerson}</strong>.
+                  Your inquiry on behalf of{' '}
+                  <strong className="text-[#0B132B]">{submittedInquiry.organizationName}</strong>{' '}
+                  ({submittedInquiry.country}) has been saved. Click below to open your
+                  email client with the pre-addressed dispatch to{' '}
+                  <strong className="text-[#0B132B]">zeid@orionyouth.eu</strong>, or copy
+                  the preview for your records.
+                </p>
+              )}
 
               {/* Message Preview Box */}
               <div className="border border-[rgba(11,19,43,0.14)] bg-[#F8F9FA] p-5 space-y-2 text-sm">
@@ -216,17 +311,34 @@ export function InstitutionalDossier() {
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <a
-                  href={buildMailtoHref(submittedInquiry)}
-                  className="inline-flex items-center justify-center bg-[#e35619] text-[#0B132B] font-display font-semibold text-sm px-6 py-3.5 rounded-none hover:bg-[#d04b12] transition-colors"
-                >
-                  Open in email client (zeid@orionyouth.eu)
-                </a>
-                <Button variant="secondary" tone="light" onClick={handleReset}>
-                  Write another inquiry
-                </Button>
-              </div>
+              {deliveryMode === 'resend' ? (
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <Button variant="secondary" tone="light" onClick={handleReset}>
+                    Write another inquiry
+                  </Button>
+                  <a
+                    href={buildMailtoHref(submittedInquiry)}
+                    className="text-xs font-semibold text-[#0B132B] underline hover:text-[#e35619] transition-colors"
+                  >
+                    Open in email client (zeid@orionyouth.eu)
+                  </a>
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <a
+                    href={buildMailtoHref(submittedInquiry)}
+                    className="inline-flex items-center justify-center bg-[#e35619] text-[#0B132B] font-display font-semibold text-sm px-6 py-3.5 rounded-none hover:bg-[#d04b12] transition-colors"
+                  >
+                    Open in email client (zeid@orionyouth.eu)
+                  </a>
+                  <Button variant="secondary" tone="light" type="button" onClick={handleCopyInquiry}>
+                    {copiedInquiry ? 'Copied inquiry text' : 'Copy inquiry text'}
+                  </Button>
+                  <Button variant="secondary" tone="light" onClick={handleReset}>
+                    Write another inquiry
+                  </Button>
+                </div>
+              )}
             </div>
           ) : (
             <form
@@ -234,6 +346,17 @@ export function InstitutionalDossier() {
               noValidate
               className="border border-[rgba(11,19,43,0.15)] bg-[#F8F9FA] p-6 md:p-10 space-y-6"
             >
+              <input
+                type="text"
+                name="orion_hp_trap"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                tabIndex={-1}
+                autoComplete="new-password"
+                aria-hidden="true"
+                className="sr-only"
+              />
+
               <div className="border-b border-[rgba(11,19,43,0.10)] pb-5 space-y-1.5">
                 <span className="text-xs font-semibold text-[rgba(11,19,43,0.6)] block">
                   Consortium &amp; mobility inquiries
@@ -250,7 +373,7 @@ export function InstitutionalDossier() {
               {errors.form && (
                 <div
                   role="alert"
-                  className="p-4 border-l-2 border-[#0B132B] bg-[rgba(11,19,43,0.05)] text-[#0B132B] text-sm font-semibold"
+                  className="p-4 border-l-2 border-[#B91C1C] bg-[#FEF2F2] text-[#B91C1C] text-sm font-semibold"
                 >
                   {errors.form}
                 </div>
@@ -263,7 +386,7 @@ export function InstitutionalDossier() {
                     htmlFor="partner-organizationName"
                     className="block text-xs font-semibold text-[#0B132B] mb-2"
                   >
-                    Organisation name <span className="text-[#e35619]">*</span>
+                    Organisation name <span className="text-[#B93E0A]">*</span>
                   </label>
                   <input
                     type="text"
@@ -277,16 +400,16 @@ export function InstitutionalDossier() {
                       errors.organizationName ? 'err-partner-org' : undefined
                     }
                     placeholder="e.g. Asociación Aurora"
-                    className={`w-full h-12 px-3.5 bg-transparent border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                    className={`w-full h-12 px-3.5 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
                       errors.organizationName
-                        ? 'border-[#0B132B]'
-                        : 'border-[rgba(11,19,43,0.20)]'
+                        ? 'border-[#B91C1C]'
+                        : 'border-[rgba(11,19,43,0.26)]'
                     }`}
                   />
                   {errors.organizationName && (
                     <p
                       id="err-partner-org"
-                      className="mt-1.5 border-l-2 border-[#0B132B] pl-2 text-xs font-semibold text-[#0B132B]"
+                      className="mt-1.5 border-l-2 border-[#B91C1C] pl-2 text-xs font-semibold text-[#B91C1C]"
                     >
                       {errors.organizationName}
                     </p>
@@ -299,7 +422,7 @@ export function InstitutionalDossier() {
                     htmlFor="partner-country"
                     className="block text-xs font-semibold text-[#0B132B] mb-2"
                   >
-                    Country <span className="text-[#e35619]">*</span>
+                    Country <span className="text-[#B93E0A]">*</span>
                   </label>
                   <input
                     type="text"
@@ -313,16 +436,16 @@ export function InstitutionalDossier() {
                       errors.country ? 'err-partner-country' : undefined
                     }
                     placeholder="e.g. Spain"
-                    className={`w-full h-12 px-3.5 bg-transparent border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                    className={`w-full h-12 px-3.5 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
                       errors.country
-                        ? 'border-[#0B132B]'
-                        : 'border-[rgba(11,19,43,0.20)]'
+                        ? 'border-[#B91C1C]'
+                        : 'border-[rgba(11,19,43,0.26)]'
                     }`}
                   />
                   {errors.country && (
                     <p
                       id="err-partner-country"
-                      className="mt-1.5 border-l-2 border-[#0B132B] pl-2 text-xs font-semibold text-[#0B132B]"
+                      className="mt-1.5 border-l-2 border-[#B91C1C] pl-2 text-xs font-semibold text-[#B91C1C]"
                     >
                       {errors.country}
                     </p>
@@ -335,7 +458,7 @@ export function InstitutionalDossier() {
                     htmlFor="partner-contactPerson"
                     className="block text-xs font-semibold text-[#0B132B] mb-2"
                   >
-                    Contact person <span className="text-[#e35619]">*</span>
+                    Contact person <span className="text-[#B93E0A]">*</span>
                   </label>
                   <input
                     type="text"
@@ -349,16 +472,16 @@ export function InstitutionalDossier() {
                       errors.contactPerson ? 'err-partner-contact' : undefined
                     }
                     placeholder="e.g. Sofia Ruiz"
-                    className={`w-full h-12 px-3.5 bg-transparent border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                    className={`w-full h-12 px-3.5 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
                       errors.contactPerson
-                        ? 'border-[#0B132B]'
-                        : 'border-[rgba(11,19,43,0.20)]'
+                        ? 'border-[#B91C1C]'
+                        : 'border-[rgba(11,19,43,0.26)]'
                     }`}
                   />
                   {errors.contactPerson && (
                     <p
                       id="err-partner-contact"
-                      className="mt-1.5 border-l-2 border-[#0B132B] pl-2 text-xs font-semibold text-[#0B132B]"
+                      className="mt-1.5 border-l-2 border-[#B91C1C] pl-2 text-xs font-semibold text-[#B91C1C]"
                     >
                       {errors.contactPerson}
                     </p>
@@ -371,7 +494,7 @@ export function InstitutionalDossier() {
                     htmlFor="partner-email"
                     className="block text-xs font-semibold text-[#0B132B] mb-2"
                   >
-                    Email address <span className="text-[#e35619]">*</span>
+                    Email address <span className="text-[#B93E0A]">*</span>
                   </label>
                   <input
                     type="email"
@@ -385,16 +508,16 @@ export function InstitutionalDossier() {
                       errors.email ? 'err-partner-email' : undefined
                     }
                     placeholder="e.g. sofia@aurora-youth.es"
-                    className={`w-full h-12 px-3.5 bg-transparent border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                    className={`w-full h-12 px-3.5 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
                       errors.email
-                        ? 'border-[#0B132B]'
-                        : 'border-[rgba(11,19,43,0.20)]'
+                        ? 'border-[#B91C1C]'
+                        : 'border-[rgba(11,19,43,0.26)]'
                     }`}
                   />
                   {errors.email && (
                     <p
                       id="err-partner-email"
-                      className="mt-1.5 border-l-2 border-[#0B132B] pl-2 text-xs font-semibold text-[#0B132B]"
+                      className="mt-1.5 border-l-2 border-[#B91C1C] pl-2 text-xs font-semibold text-[#B91C1C]"
                     >
                       {errors.email}
                     </p>
@@ -408,7 +531,7 @@ export function InstitutionalDossier() {
                   htmlFor="partner-topic"
                   className="block text-xs font-semibold text-[#0B132B] mb-2"
                 >
-                  Partnership topic <span className="text-[#e35619]">*</span>
+                  Partnership topic <span className="text-[#B93E0A]">*</span>
                 </label>
                 <input
                   type="text"
@@ -422,16 +545,16 @@ export function InstitutionalDossier() {
                     errors.topic ? 'err-partner-topic' : undefined
                   }
                   placeholder="e.g. KA152 Youth Exchange consortium invitation"
-                  className={`w-full h-12 px-3.5 bg-transparent border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                  className={`w-full h-12 px-3.5 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
                     errors.topic
-                      ? 'border-[#0B132B]'
-                      : 'border-[rgba(11,19,43,0.20)]'
+                      ? 'border-[#B91C1C]'
+                      : 'border-[rgba(11,19,43,0.26)]'
                   }`}
                 />
                 {errors.topic && (
                   <p
                     id="err-partner-topic"
-                    className="mt-1.5 border-l-2 border-[#0B132B] pl-2 text-xs font-semibold text-[#0B132B]"
+                    className="mt-1.5 border-l-2 border-[#B91C1C] pl-2 text-xs font-semibold text-[#B91C1C]"
                   >
                     {errors.topic}
                   </p>
@@ -445,7 +568,7 @@ export function InstitutionalDossier() {
                   className="block text-xs font-semibold text-[#0B132B] mb-2"
                 >
                   Collaboration scope &amp; message{' '}
-                  <span className="text-[#e35619]">*</span>
+                  <span className="text-[#B93E0A]">*</span>
                 </label>
                 <textarea
                   id="partner-message"
@@ -459,20 +582,23 @@ export function InstitutionalDossier() {
                     errors.message ? 'err-partner-message' : undefined
                   }
                   placeholder="Tell us about your project concept, target timeline, and proposed role for Orion..."
-                  className={`w-full p-3.5 bg-transparent border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                  className={`w-full p-3.5 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
                     errors.message
-                      ? 'border-[#0B132B]'
-                      : 'border-[rgba(11,19,43,0.20)]'
+                      ? 'border-[#B91C1C]'
+                      : 'border-[rgba(11,19,43,0.26)]'
                   }`}
                 />
                 {errors.message && (
                   <p
                     id="err-partner-message"
-                    className="mt-1.5 border-l-2 border-[#0B132B] pl-2 text-xs font-semibold text-[#0B132B]"
+                    className="mt-1.5 border-l-2 border-[#B91C1C] pl-2 text-xs font-semibold text-[#B91C1C]"
                   >
                     {errors.message}
                   </p>
                 )}
+                <p className="mt-1 text-xs text-[rgba(11,19,43,0.68)]">
+                  Minimum 20 characters required. Maximum 4,000 characters.
+                </p>
               </div>
 
               <div className="pt-2">

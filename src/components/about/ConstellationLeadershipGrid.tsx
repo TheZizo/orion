@@ -83,7 +83,7 @@ export function ConstellationLeadershipGrid({
           aria-hidden="true"
         >
           <svg
-            viewBox="0 0 1000 132"
+            viewBox="0 0 1000 140"
             preserveAspectRatio="xMidYMid meet"
             className="w-full h-full"
             fill="none"
@@ -146,22 +146,24 @@ export function ConstellationLeadershipGrid({
                   )}
                   <text
                     x={node.x}
-                    y={node.y - 12}
+                    y={node.y - 14}
                     textAnchor="middle"
-                    fill={isNodeActive ? '#e35619' : 'rgba(248,249,250,0.55)'}
-                    fontSize="10"
-                    fontFamily="monospace"
-                    className="tabular-nums font-semibold"
+                    fill={isNodeActive ? '#F8F9FA' : 'rgba(248,249,250,0.72)'}
+                    fontSize="11.5"
+                    fontFamily="var(--font-display), sans-serif"
+                    fontWeight={isNodeActive ? '700' : '600'}
+                    className="tabular-nums"
                   >
                     {node.index}
                   </text>
                   <text
                     x={node.x}
-                    y={node.y + 20}
+                    y={node.y + 22}
                     textAnchor="middle"
-                    fill={isNodeActive ? '#e35619' : '#F8F9FA'}
-                    fontSize="12"
-                    fontWeight="500"
+                    fill="#F8F9FA"
+                    fontSize="13.5"
+                    fontFamily="var(--font-display), sans-serif"
+                    fontWeight={isNodeActive ? '700' : '500'}
                   >
                     {node.label}
                   </text>
@@ -249,22 +251,17 @@ export function ConstellationLeadershipGrid({
                             />
                           </div>
                         ) : (
-                          <>
-                            <div className="w-14 h-14 aspect-square bg-[#0B132B] border border-[#1D356B] flex items-center justify-center relative">
-                              <span className="font-display font-semibold text-sm text-[#F8F9FA] tracking-tight">
-                                {monogram}
-                              </span>
-                              <span
-                                aria-hidden="true"
-                                className="absolute -top-1.5 -right-1.5"
-                              >
-                                <SparkleStar size={10} color="#e35619" />
-                              </span>
-                            </div>
-                            <span className="text-[10px] leading-tight text-center font-medium text-[rgba(11,19,43,0.52)]">
-                              Portrait placeholder
+                          <div className="w-14 h-14 aspect-square bg-[#0B132B] border border-[#1D356B] flex items-center justify-center relative">
+                            <span className="font-display font-semibold text-sm text-[#F8F9FA] tracking-tight">
+                              {monogram}
                             </span>
-                          </>
+                            <span
+                              aria-hidden="true"
+                              className="absolute -top-1.5 -right-1.5"
+                            >
+                              <SparkleStar size={10} color="#e35619" />
+                            </span>
+                          </div>
                         )}
                       </div>
 
@@ -321,7 +318,7 @@ export function ConstellationLeadershipGrid({
                         {member.bio}
                       </p>
                     )}
-                    <div className="pt-2 text-xs text-[rgba(11,19,43,0.52)]">
+                    <div className="pt-2 text-xs text-[rgba(11,19,43,0.68)]">
                       Founding leadership anchor, Debrecen
                     </div>
                   </div>
@@ -358,22 +355,17 @@ export function ConstellationLeadershipGrid({
                         />
                       </div>
                     ) : (
-                      <>
-                        <div className="w-14 h-14 aspect-square bg-[#0B132B] border border-[#1D356B] flex items-center justify-center relative">
-                          <span className="font-display font-semibold text-sm text-[#F8F9FA] tracking-tight">
-                            {monogram}
-                          </span>
-                          <span
-                            aria-hidden="true"
-                            className="absolute -top-1.5 -right-1.5"
-                          >
-                            <SparkleStar size={10} color="#e35619" />
-                          </span>
-                        </div>
-                        <span className="text-[10px] leading-tight text-center font-medium text-[rgba(11,19,43,0.52)]">
-                          Portrait placeholder
+                      <div className="w-14 h-14 aspect-square bg-[#0B132B] border border-[#1D356B] flex items-center justify-center relative">
+                        <span className="font-display font-semibold text-sm text-[#F8F9FA] tracking-tight">
+                          {monogram}
                         </span>
-                      </>
+                        <span
+                          aria-hidden="true"
+                          className="absolute -top-1.5 -right-1.5"
+                        >
+                          <SparkleStar size={10} color="#e35619" />
+                        </span>
+                      </div>
                     )}
                   </div>
 

@@ -61,7 +61,7 @@ export function HeroSection() {
           <div className="lg:col-span-5 space-y-6">
             <div className="inline-flex flex-wrap items-center gap-2.5 px-3.5 py-1.5 bg-[#111D3B] border border-[#1D356B] text-xs text-[#F8F9FA]">
               <span className="w-2 h-2 rounded-full bg-[#E35619] animate-pulse" aria-hidden="true" />
-              <span>Orion Fiatalok Informális Csoportja — Debrecen</span>
+              <span>Orion Fiatalok Informális Csoportja, Debrecen</span>
             </div>
 
             <h1 className="type-display text-[#F8F9FA] tracking-[-0.02em]">

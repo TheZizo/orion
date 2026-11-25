@@ -1,6 +1,15 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { SparkleStar } from '@/components/motifs/SparkleStar';
 import { Button } from '@/components/ui/Button';
+
+export const metadata: Metadata = {
+  title: '404 — Signal Lost',
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 
 export default function NotFound() {
   return (

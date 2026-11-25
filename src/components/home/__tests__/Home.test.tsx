@@ -74,7 +74,7 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
   });
 
   describe('ReForestStory', () => {
-    it('renders daylight spread on #F8F9FA, telemetry badge, 4 canonical metrics (40 + 8, 4, 12 days, 1,200+), Kemal quote, no accordion button, and project links', () => {
+    it('renders daylight spread on #F8F9FA, telemetry badge, 4 canonical metrics (40 + 8, 4, 12 days, 1,000+), Kemal quote, no accordion button, and project links', () => {
       const { container } = render(<ReForestStory />);
 
       const section = container.querySelector('section');
@@ -84,7 +84,7 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
         screen.getByText(/46\.78° N, 25\.78° E, Lacu Roșu, Romania/i)
       ).toBeInTheDocument();
       expect(
-        screen.getByText(/October 11–22, 2026, Alpine Meadow, Lacu Roșu, Harghita/i)
+        screen.getByText(/October 11–22, 2026 \(incl\. travel days\), Lacu Roșu, Harghita/i)
       ).toBeInTheDocument();
 
       // Title & verified single testimonial attributed to Kemal
@@ -114,7 +114,7 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
       expect(screen.getByText(/Partner countries/i)).toBeInTheDocument();
       expect(screen.getByText('12 days')).toBeInTheDocument();
       expect(screen.getByText(/Mobility duration/i)).toBeInTheDocument();
-      expect(screen.getByText('1,200+')).toBeInTheDocument();
+      expect(screen.getByText('1,000+')).toBeInTheDocument();
       expect(screen.getByText(/Seedlings planted/i)).toBeInTheDocument();
 
       // Links: internal story & external official project portal
@@ -356,7 +356,7 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
       const inquiryLink = screen.getByRole('link', {
         name: /Send a partnership inquiry/i,
       });
-      expect(inquiryLink).toHaveAttribute('href', '/partners');
+      expect(inquiryLink).toHaveAttribute('href', '/partners#partner-inquiry');
 
       const dossierLink = screen.getByRole('link', {
         name: /Partner dossier/i,

@@ -7,8 +7,10 @@ interface StepInfo {
   title: string;
   time: string;
   description: string;
-  sampleQuote?: string;
 }
+
+const SAMPLE_MOTIVATION =
+  'I am starting my first job next autumn and want to replace my anxiety around budgeting with a concrete savings system. In Hungary, I hope to share how young people in my city navigate rent and inflation while learning practical cashflow tools from peers. Afterward, I will host a local peer-budgeting workshop at my university youth club.';
 
 const STEPS: StepInfo[] = [
   {
@@ -24,8 +26,6 @@ const STEPS: StepInfo[] = [
     time: '~5 mins',
     description:
       'Tell us in three honest sentences what this theme means to your growth and what you hope to contribute.',
-    sampleQuote:
-      'I am starting my first job next autumn and want to replace my anxiety around budgeting with a concrete savings system. In Hungary, I hope to share how young people in my city navigate rent and inflation while learning practical cashflow tools from peers. Afterward, I will host a local peer-budgeting workshop at my university youth club.',
   },
   {
     num: '3',
@@ -40,8 +40,8 @@ const STEPS: StepInfo[] = [
  * HowToApply Component — Daylight Off-White (#F8F9FA)
  *
  * Static 3-step application trajectory joined by a clean TrajectoryArc flight path.
- * Zero tab clicking: all 3 steps and the sample motivation quote inside Step 2
- * are permanently visible on elevated white cards (#FFFFFF).
+ * Zero tab clicking: all 3 steps are balanced in equal-height cards on #FFFFFF,
+ * with the sample 3-sentence motivation rendered cleanly underneath as a full-width strip.
  */
 export function HowToApply() {
   const ARC_CURVATURE = -0.045;
@@ -126,7 +126,7 @@ export function HowToApply() {
                     </h3>
                   </div>
 
-                  <span className="text-xs text-[rgba(11,19,43,0.55)] tabular-nums shrink-0 whitespace-nowrap">
+                  <span className="text-xs text-[rgba(11,19,43,0.68)] tabular-nums shrink-0 whitespace-nowrap">
                     {step.time}
                   </span>
                 </div>
@@ -134,25 +134,24 @@ export function HowToApply() {
                 <p className="type-body text-sm text-[rgba(11,19,43,0.76)] leading-relaxed">
                   {step.description}
                 </p>
-
-                {step.sampleQuote && (
-                  <div className="pt-3 border-t border-[rgba(11,19,43,0.10)] space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="w-1.5 h-1.5 rounded-full bg-[#E35619]"
-                        aria-hidden="true"
-                      />
-                      <span className="text-xs font-semibold text-[#0B132B]">
-                        Sample 3-sentence motivation
-                      </span>
-                    </div>
-                    <blockquote className="text-xs text-[rgba(11,19,43,0.82)] italic leading-relaxed bg-[#F8F9FA] p-3.5 border border-[rgba(11,19,43,0.10)]">
-                      &ldquo;{step.sampleQuote}&rdquo;
-                    </blockquote>
-                  </div>
-                )}
               </div>
             ))}
+          </div>
+
+          {/* Full-width Sample 3-sentence motivation strip */}
+          <div className="bg-white border border-[rgba(11,19,43,0.12)] p-6 space-y-2">
+            <div className="flex items-center gap-2">
+              <span
+                className="w-1.5 h-1.5 rounded-full bg-[#E35619]"
+                aria-hidden="true"
+              />
+              <span className="text-xs font-semibold text-[#0B132B]">
+                Sample 3-sentence motivation
+              </span>
+            </div>
+            <blockquote className="text-sm text-[rgba(11,19,43,0.82)] italic leading-relaxed">
+              &ldquo;{SAMPLE_MOTIVATION}&rdquo;
+            </blockquote>
           </div>
         </div>
       </div>

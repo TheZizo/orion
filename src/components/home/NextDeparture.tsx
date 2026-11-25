@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
 import { DailyExchangeAnatomy } from '@/components/home/DailyExchangeAnatomy';
@@ -31,25 +29,25 @@ export function NextDeparture() {
             {/* 4-Column Key Specs Bar */}
             <dl className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6 border-t border-[rgba(11,19,43,0.12)]">
               <div>
-                <dt className="text-xs text-[rgba(11,19,43,0.55)]">When</dt>
+                <dt className="text-xs text-[rgba(11,19,43,0.68)]">When</dt>
                 <dd className="text-sm font-semibold text-[#0B132B] mt-1 tabular-nums">
                   March 2027 (9 days)
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-[rgba(11,19,43,0.55)]">Where</dt>
+                <dt className="text-xs text-[rgba(11,19,43,0.68)]">Where</dt>
                 <dd className="text-sm font-semibold text-[#0B132B] mt-1">
                   Eastern Hungary
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-[rgba(11,19,43,0.55)]">Who</dt>
+                <dt className="text-xs text-[rgba(11,19,43,0.68)]">Who</dt>
                 <dd className="text-sm font-semibold text-[#0B132B] mt-1 tabular-nums">
                   Ages 18–26 (32 youth + 8 leaders)
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-[rgba(11,19,43,0.55)]">Cost</dt>
+                <dt className="text-xs text-[rgba(11,19,43,0.68)]">Cost</dt>
                 <dd className="text-sm font-semibold text-[#0B132B] mt-1">
                   100% Erasmus+ funded
                 </dd>
@@ -86,7 +84,7 @@ export function NextDeparture() {
                 What You Will Master
               </div>
               <p className="text-sm text-[rgba(11,19,43,0.85)] leading-relaxed">
-                Peer cashflow systems, inflation navigation, collaborative workshops, and cross-border leadership.
+                Banking realities, AI budgeting tools, anti-fraud awareness, and co-publishing a practical youth financial handbook.
               </p>
             </div>
 

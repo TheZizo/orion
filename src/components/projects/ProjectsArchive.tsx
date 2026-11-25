@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Project, ProjectStatus } from '@/types/orion';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Button } from '@/components/ui/Button';
+import { SparkleStar } from '@/components/motifs/SparkleStar';
 import { PhotoGalleryGrid } from './PhotoGalleryGrid';
 
 export interface ProjectsArchiveProps {
@@ -218,8 +219,54 @@ export function ProjectsArchive({ initialProjects }: ProjectsArchiveProps) {
                         priority={idx === 0}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[rgba(248,249,250,0.5)] text-sm">
-                        Field documentation
+                      <div className="relative w-full h-full bg-[#0B132B] text-[#F8F9FA] p-6 sm:p-8 flex flex-col justify-between overflow-hidden">
+                        <svg
+                          viewBox="0 0 400 250"
+                          className="absolute inset-0 w-full h-full pointer-events-none opacity-25"
+                          aria-hidden="true"
+                        >
+                          <circle
+                            cx="320"
+                            cy="40"
+                            r="110"
+                            fill="none"
+                            stroke="#1D356B"
+                            strokeWidth="1"
+                          />
+                          <ellipse
+                            cx="210"
+                            cy="130"
+                            rx="170"
+                            ry="72"
+                            transform="rotate(-12 210 130)"
+                            fill="none"
+                            stroke="rgba(248,249,250,0.35)"
+                            strokeWidth="1"
+                            strokeDasharray="4 4"
+                          />
+                        </svg>
+
+                        <div className="relative z-10 flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2 text-xs font-medium text-[rgba(248,249,250,0.78)]">
+                            <SparkleStar size={12} color="#e35619" />
+                            <span>{project.actionType}</span>
+                          </div>
+                          <span className="text-xs text-[rgba(248,249,250,0.72)] tabular-nums">
+                            {project.dateLabel}
+                          </span>
+                        </div>
+
+                        <div className="relative z-10 space-y-2 my-auto py-2">
+                          <div className="font-display font-bold text-lg sm:text-xl text-[#F8F9FA] leading-snug">
+                            {project.title}
+                          </div>
+                        </div>
+
+                        {project.grantReference && (
+                          <div className="relative z-10 border-t border-[rgba(248,249,250,0.14)] pt-3 text-[11px] text-[rgba(248,249,250,0.72)] tabular-nums">
+                            Grant {project.grantReference}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -290,7 +337,7 @@ export function ProjectsArchive({ initialProjects }: ProjectsArchiveProps) {
               captured on location across Central and Eastern Europe.
             </p>
           </div>
-          <PhotoGalleryGrid gallery={allGalleryItems} />
+          <PhotoGalleryGrid gallery={allGalleryItems} showProjectAttribution />
         </section>
       )}
     </div>

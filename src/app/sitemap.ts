@@ -2,10 +2,12 @@ import type { MetadataRoute } from 'next';
 import { getOpenCalls, getProjects } from '@/lib/orionData';
 
 const BASE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://orionyouth.eu'
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://www.orionyouth.eu'
 ).replace(/\/$/, '');
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const lastModified = new Date('2026-11-25');
+
   const staticRoutes: Array<{
     path: string;
     changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'];
@@ -22,21 +24,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const staticEntries: MetadataRoute.Sitemap = staticRoutes.map((route) => ({
     url: `${BASE_URL}${route.path}`,
-    lastModified: new Date('2026-11-01'),
+    lastModified,
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }));
 
   const callEntries: MetadataRoute.Sitemap = getOpenCalls().map((call) => ({
     url: `${BASE_URL}/open-calls/${call.slug}`,
-    lastModified: new Date('2026-11-01'),
-    changeFrequency: 'weekly',
-    priority: 0.85,
+    lastModified,
+    changeFrequency: call.status === 'Closed' ? 'yearly' : 'weekly',
+    priority: call.status === 'Closed' ? 0.5 : 0.9,
   }));
 
   const projectEntries: MetadataRoute.Sitemap = getProjects().map((project) => ({
     url: `${BASE_URL}/projects/${project.slug}`,
-    lastModified: new Date('2026-11-01'),
+    lastModified,
     changeFrequency: 'monthly',
     priority: 0.75,
   }));

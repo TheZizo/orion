@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
 import { SparkleStar } from '@/components/motifs/SparkleStar';
@@ -15,7 +13,7 @@ export function ErasmusHorizonSlider() {
         {/* Section Header (Left-aligned, max-w-3xl space-y-3) */}
         <div className="max-w-3xl space-y-3">
           <div className="type-eyebrow text-[#0B132B]/60">
-            DEMYSTIFYING ERASMUS+
+            Demystifying Erasmus+
           </div>
           <h2 className="type-h2 text-[#0B132B]">
             Two European paths. One is open to everyone.
@@ -32,7 +30,7 @@ export function ErasmusHorizonSlider() {
             <div className="space-y-6">
               <div>
                 <div className="type-eyebrow text-[#0B132B]/60">
-                  UNIVERSITY SEMESTER (KA131)
+                  University semester (KA131)
                 </div>
                 <h3 className="type-h3 text-[#0B132B]/75 mt-1">
                   Academic relocation
@@ -68,10 +66,10 @@ export function ErasmusHorizonSlider() {
             <div className="space-y-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="type-eyebrow text-[#F8F9FA]/60">
-                  ORION YOUTH EXCHANGE (KA152)
+                  Orion Youth Exchange (KA152)
                 </div>
-                <span className="text-[11px] font-bold tracking-wider px-2.5 py-1 bg-[#111D3B] text-[#E35619] border border-[#E35619]/30 uppercase tabular-nums">
-                  100% ERASMUS+ FUNDED
+                <span className="bg-[#E35619] text-[#0B132B] font-bold px-2.5 py-1 text-xs tabular-nums">
+                  100% Erasmus+ funded
                 </span>
               </div>
               <div>

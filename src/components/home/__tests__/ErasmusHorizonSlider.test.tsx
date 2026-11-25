@@ -7,7 +7,7 @@ describe('ErasmusHorizonSlider Component — Zero-Widget 12-Column Architectural
   it('renders section header with eyebrow, H2 display headline, and explanatory lead', () => {
     render(<ErasmusHorizonSlider />);
 
-    expect(screen.getByText('DEMYSTIFYING ERASMUS+')).toBeInTheDocument();
+    expect(screen.getByText('Demystifying Erasmus+')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
         level: 2,
@@ -22,7 +22,7 @@ describe('ErasmusHorizonSlider Component — Zero-Widget 12-Column Architectural
   it('renders the left 5-column University Semester (KA131) misconception ledger', () => {
     render(<ErasmusHorizonSlider />);
 
-    expect(screen.getByText('UNIVERSITY SEMESTER (KA131)')).toBeInTheDocument();
+    expect(screen.getByText('University semester (KA131)')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 3, name: /Academic relocation/i })
     ).toBeInTheDocument();
@@ -47,8 +47,8 @@ describe('ErasmusHorizonSlider Component — Zero-Widget 12-Column Architectural
   it('renders the right 7-column Orion Youth Exchange (KA152) reality panel with verified funding badge', () => {
     render(<ErasmusHorizonSlider />);
 
-    expect(screen.getByText('ORION YOUTH EXCHANGE (KA152)')).toBeInTheDocument();
-    expect(screen.getByText('100% ERASMUS+ FUNDED')).toBeInTheDocument();
+    expect(screen.getByText('Orion Youth Exchange (KA152)')).toBeInTheDocument();
+    expect(screen.getByText('100% Erasmus+ funded')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 3, name: /Short, immersive cross-border adventure/i })
     ).toBeInTheDocument();

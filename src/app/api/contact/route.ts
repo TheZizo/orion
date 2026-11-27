@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { Resend } from 'resend';
 import { ORION_ORG } from '@/lib/orionData';
 import { validateContactMessage, validatePartnerInquiry } from '@/lib/storage';
 import type { ContactMessage, PartnerInquiry } from '@/types/orion';
@@ -104,22 +105,73 @@ function generateId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function cleanSingleLine(value: unknown): string {
+  return String(value ?? '').replace(/[\r\n]+/g, ' ').trim();
+}
+
+function renderHtmlSection(
+  heading: string,
+  rows: Array<[label: string, value: string]>,
+  message: string
+): string {
+  const rowsHtml = rows
+    .map(
+      ([label, value]) =>
+        `<tr><td style="padding:6px 12px 6px 0;font-weight:600;color:#4a5568;vertical-align:top;white-space:nowrap;">${escapeHtml(label)}</td><td style="padding:6px 0;color:#111827;">${escapeHtml(value)}</td></tr>`
+    )
+    .join('');
+
+  const messageHtml = escapeHtml(message).replace(/\r?\n/g, '<br />');
+
+  return [
+    '<div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:640px;margin:0 auto;padding:24px;color:#111827;line-height:1.5;">',
+    `<h2 style="margin:0 0 16px;font-size:18px;color:#0f172a;">${escapeHtml(heading)}</h2>`,
+    `<table style="border-collapse:collapse;width:100%;margin-bottom:20px;font-size:14px;">${rowsHtml}</table>`,
+    '<div style="padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:14px;color:#111827;">',
+    '<div style="font-weight:600;color:#4a5568;margin-bottom:8px;">Message</div>',
+    `<div>${messageHtml}</div>`,
+    '</div>',
+    '</div>',
+  ].join('');
+}
+
 function formatEmailPayload(body: ContactApiPayload, kind: 'contact' | 'partner'): {
   subject: string;
+  html: string;
   text: string;
   replyTo: string;
 } {
   if (kind === 'partner') {
-    const org = String(body.organizationName ?? '').trim();
-    const country = String(body.country ?? '').trim();
-    const contactPerson = String(body.contactPerson ?? '').trim();
-    const email = String(body.email ?? '').trim();
-    const topic = String(body.topic ?? '').trim();
+    const org = cleanSingleLine(body.organizationName);
+    const country = cleanSingleLine(body.country);
+    const contactPerson = cleanSingleLine(body.contactPerson);
+    const email = cleanSingleLine(body.email);
+    const topic = cleanSingleLine(body.topic);
     const message = String(body.message ?? '').trim();
 
     return {
       subject: `[Orion Partner Inquiry] ${topic} — ${org} (${country})`,
       replyTo: email,
+      html: renderHtmlSection(
+        'New Erasmus+ Partnership Inquiry via orionyouth.eu',
+        [
+          ['Organisation', org],
+          ['Country', country],
+          ['Contact Person', contactPerson],
+          ['Official Email', email],
+          ['Topic', topic],
+        ],
+        message
+      ),
       text: [
         `New Erasmus+ Partnership Inquiry via orionyouth.eu`,
         ``,
@@ -136,14 +188,24 @@ function formatEmailPayload(body: ContactApiPayload, kind: 'contact' | 'partner'
   }
 
   const modeLabel = body.mode === 'partner' ? 'Partner / Institution' : 'Participant';
-  const name = String(body.name ?? '').trim();
-  const email = String(body.email ?? '').trim();
-  const subjectLine = String(body.subject ?? '').trim();
+  const name = cleanSingleLine(body.name);
+  const email = cleanSingleLine(body.email);
+  const subjectLine = cleanSingleLine(body.subject);
   const message = String(body.message ?? '').trim();
 
   return {
     subject: `[Orion Contact · ${modeLabel}] ${subjectLine}`,
     replyTo: email,
+    html: renderHtmlSection(
+      'New Contact Message via orionyouth.eu',
+      [
+        ['Sender Mode', modeLabel],
+        ['Name', name],
+        ['Email', email],
+        ['Subject', subjectLine],
+      ],
+      message
+    ),
     text: [
       `New Contact Message via orionyouth.eu`,
       ``,
@@ -223,33 +285,35 @@ export async function POST(request: Request) {
   const resendApiKey = process.env.RESEND_API_KEY?.trim();
   if (resendApiKey) {
     try {
-      const providerResponse = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const resend = new Resend(resendApiKey);
+      const { data, error } = await resend.emails.send(
+        {
           from: process.env.RESEND_FROM_EMAIL || 'Orion Website <onboarding@resend.dev>',
           to: [recipient],
-          reply_to: emailContent.replyTo,
+          replyTo: emailContent.replyTo,
           subject: emailContent.subject,
+          html: emailContent.html,
           text: emailContent.text,
-        }),
-        signal: AbortSignal.timeout(8000),
-      });
+        },
+        { idempotencyKey: `${kind}/${id}` }
+      );
 
-      if (!providerResponse.ok) {
-        const providerError = await providerResponse.text().catch(() => '');
-        console.error('[api/contact] Email provider error:', providerResponse.status, providerError);
+      if (error) {
+        console.error('[api/contact] Email provider error:', error.name, error.message);
         return NextResponse.json(
           { ok: false, error: 'Failed to dispatch email via provider.' },
           { status: 502 }
         );
       }
 
+      console.info('[api/contact] Email dispatched via Resend:', {
+        id,
+        kind,
+        emailId: data?.id,
+      });
+
       return NextResponse.json(
-        { ok: true, recipient, id, delivery: 'resend' },
+        { ok: true, recipient, id, emailId: data?.id, delivery: 'resend' },
         { status: 200 }
       );
     } catch (err) {

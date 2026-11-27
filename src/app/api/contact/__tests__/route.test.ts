@@ -1,4 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+const { sendMock, ResendMock } = vi.hoisted(() => {
+  const sendMock = vi.fn();
+  const ResendMock = vi.fn(function (this: { emails: { send: typeof sendMock } }) {
+    this.emails = { send: sendMock };
+  });
+  return { sendMock, ResendMock };
+});
+
+vi.mock('resend', () => ({
+  Resend: ResendMock,
+}));
+
 import { POST, resetContactRateLimit } from '../route';
 
 describe('POST /api/contact', () => {
@@ -6,6 +19,8 @@ describe('POST /api/contact', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
+    sendMock.mockReset();
+    ResendMock.mockClear();
     resetContactRateLimit();
     process.env = { ...originalEnv };
     delete process.env.RESEND_API_KEY;
@@ -217,12 +232,11 @@ describe('POST /api/contact', () => {
 
   it('dispatches valid partner inquiry via Resend when RESEND_API_KEY is configured', async () => {
     process.env.RESEND_API_KEY = 're_test_key';
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ id: 'email_123' }),
+    process.env.RESEND_FROM_EMAIL = 'Orion Website <noreply@send.orionyouth.eu>';
+    sendMock.mockResolvedValue({
+      data: { id: 'email_123' },
+      error: null,
     });
-    vi.stubGlobal('fetch', fetchMock);
 
     const req = new Request('http://localhost/api/contact', {
       method: 'POST',
@@ -235,7 +249,7 @@ describe('POST /api/contact', () => {
         email: 'sofia@aurora-youth.es',
         topic: 'KA152 Youth Exchange Consortium',
         message:
-          'We are preparing a KA152 proposal and would love Orion Fiatalok Informális Csoportja to act as the Hungarian partner.',
+          'We are preparing a <script>alert(1)</script> KA152 proposal and would love Orion to act as partner.',
       }),
     });
 
@@ -245,12 +259,54 @@ describe('POST /api/contact', () => {
     expect(res.status).toBe(200);
     expect(data.ok).toBe(true);
     expect(data.recipient).toBe('zeid@orionyouth.eu');
+    expect(data.emailId).toBe('email_123');
     expect(data.delivery).toBe('resend');
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock.mock.calls[0][0]).toBe('https://api.resend.com/emails');
+    expect(ResendMock).toHaveBeenCalledWith('re_test_key');
+    expect(sendMock).toHaveBeenCalledTimes(1);
 
-    const sentBody = JSON.parse(fetchMock.mock.calls[0][1].body as string);
-    expect(sentBody.to).toEqual(['zeid@orionyouth.eu']);
-    expect(sentBody.reply_to).toBe('sofia@aurora-youth.es');
+    const [sentPayload, requestOptions] = sendMock.mock.calls[0];
+    expect(sentPayload.from).toBe('Orion Website <noreply@send.orionyouth.eu>');
+    expect(sentPayload.to).toEqual(['zeid@orionyouth.eu']);
+    expect(sentPayload.replyTo).toBe('sofia@aurora-youth.es');
+    expect(sentPayload.subject).toContain('KA152 Youth Exchange Consortium');
+    expect(sentPayload.text).toContain('Asociación Aurora');
+    expect(sentPayload.html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
+    expect(sentPayload.html).not.toContain('<script>');
+    expect(requestOptions).toEqual({
+      idempotencyKey: expect.stringMatching(/^partner\//),
+    });
+  });
+
+  it('returns 502 when Resend returns an error object', async () => {
+    process.env.RESEND_API_KEY = 're_test_key';
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    sendMock.mockResolvedValue({
+      data: null,
+      error: {
+        name: 'validation_error',
+        message: 'The send.orionyouth.eu domain is not verified.',
+      },
+    });
+
+    const req = new Request('http://localhost/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        kind: 'contact',
+        mode: 'participant',
+        name: 'Bence Varga',
+        email: 'bence@varga-mail.hu',
+        subject: 'Question regarding travel reimbursement',
+        message: 'Hello Orion! Could you clarify how train tickets are reimbursed for Hungary?',
+      }),
+    });
+
+    const res = await POST(req);
+    const data = await res.json();
+
+    expect(res.status).toBe(502);
+    expect(data.ok).toBe(false);
+    expect(data.error).toBe('Failed to dispatch email via provider.');
+    expect(errorSpy).toHaveBeenCalledTimes(1);
   });
 });

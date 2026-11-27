@@ -40,7 +40,7 @@ export const PARTICIPANT_FAQS: FaqItem[] = [
 
 export function ParticipantFaq() {
   return (
-    <div className="space-y-6" aria-labelledby="faq-heading">
+    <section className="space-y-6" aria-labelledby="faq-heading">
       <div className="border-b border-[rgba(11,19,43,0.10)] pb-4">
         <h3 id="faq-heading" className="type-h3 text-[#0B132B]">
           Frequently asked questions
@@ -54,15 +54,15 @@ export function ParticipantFaq() {
         {PARTICIPANT_FAQS.map((faq, idx) => (
           <details
             key={idx}
-            className="group py-5 transition-colors hover:bg-[rgba(11,19,43,0.02)]"
+            className="orion-faq-item group py-5 transition-colors hover:bg-[rgba(11,19,43,0.02)]"
           >
-            <summary className="cursor-pointer list-none flex items-center justify-between gap-4 select-none focus-visible:outline-none">
-              <span className="font-display font-semibold text-sm md:text-base text-[#0B132B] group-open:border-l-2 group-open:border-[#e35619] group-open:pl-3 transition-all">
+            <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-4 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2">
+              <span className="font-display font-semibold text-sm md:text-base text-[#0B132B] group-open:border-l-2 group-open:border-[#E35619] group-open:pl-3 transition-all">
                 {faq.question}
               </span>
               <span
                 aria-hidden="true"
-                className="font-body text-base text-[rgba(11,19,43,0.5)] group-open:rotate-45 transition-transform duration-150 inline-block w-5 h-5 text-center leading-none"
+                className="font-body text-base text-[#E35619] group-open:rotate-45 transition-transform duration-150 inline-block w-5 h-5 text-center leading-none shrink-0"
               >
                 +
               </span>
@@ -75,6 +75,6 @@ export function ParticipantFaq() {
           </details>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

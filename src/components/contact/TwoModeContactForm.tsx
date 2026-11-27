@@ -267,10 +267,10 @@ export function TwoModeContactForm() {
           aria-controls="panel-contact"
           tabIndex={mode === 'participant' ? 0 : -1}
           onClick={() => handleModeChange('participant')}
-          className={`py-3.5 px-5 text-left font-display text-sm md:text-base font-semibold tracking-tight transition-colors cursor-pointer select-none rounded-none focus-visible:outline-none ${
+          className={`py-3.5 px-5 text-left font-display text-sm md:text-base font-semibold tracking-tight transition-colors cursor-pointer select-none rounded-none border-t-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 ${
             mode === 'participant'
-              ? 'bg-[#0B132B] text-[#F8F9FA]'
-              : 'text-[#0B132B] hover:bg-[rgba(11,19,43,0.04)]'
+              ? 'bg-[#0B132B] text-[#F8F9FA] border-t-[#E35619]'
+              : 'border-t-transparent text-[#0B132B] hover:bg-[rgba(11,19,43,0.04)]'
           }`}
         >
           <span className="block text-xs opacity-70">
@@ -288,10 +288,10 @@ export function TwoModeContactForm() {
           aria-controls="panel-contact"
           tabIndex={mode === 'partner' ? 0 : -1}
           onClick={() => handleModeChange('partner')}
-          className={`py-3.5 px-5 text-left font-display text-sm md:text-base font-semibold tracking-tight transition-colors cursor-pointer select-none rounded-none focus-visible:outline-none ${
+          className={`py-3.5 px-5 text-left font-display text-sm md:text-base font-semibold tracking-tight transition-colors cursor-pointer select-none rounded-none border-t-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 ${
             mode === 'partner'
-              ? 'bg-[#0B132B] text-[#F8F9FA]'
-              : 'text-[#0B132B] hover:bg-[rgba(11,19,43,0.04)]'
+              ? 'bg-[#0B132B] text-[#F8F9FA] border-t-[#E35619]'
+              : 'border-t-transparent text-[#0B132B] hover:bg-[rgba(11,19,43,0.04)]'
           }`}
         >
           <span className="block text-xs opacity-70">
@@ -309,33 +309,33 @@ export function TwoModeContactForm() {
         className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start"
       >
         {/* Form Column (7 cols) */}
-        <div className="lg:col-span-7">
+        <div className="lg:col-span-7 min-w-0">
           {fallbackMessage ? (
             <div
               data-testid="contact-direct-email-fallback"
-              className="border border-[rgba(11,19,43,0.15)] bg-white p-8 md:p-12 space-y-6"
+              className="bg-[#0B132B] text-[#F8F9FA] border-t-2 border-t-[#E35619] p-8 md:p-10 space-y-6"
             >
-              <div className="border-b border-[rgba(11,19,43,0.10)] pb-4">
-                <span className="text-xs font-semibold text-[#0B132B] tabular-nums">
+              <div className="border-b border-white/15 pb-4">
+                <span className="text-xs font-semibold text-[#F8F9FA]/80 tabular-nums">
                   Message preserved locally (Ref: {fallbackMessage.id.slice(0, 8)})
                 </span>
-                <h3 className="type-h2 text-[#0B132B] mt-1">
+                <h3 className="type-h2 text-[#F8F9FA] mt-1">
                   Automated relay is temporarily offline
                 </h3>
               </div>
 
-              <p className="type-body text-[rgba(11,19,43,0.82)] leading-relaxed">
+              <p className="type-body text-[#F8F9FA]/85 leading-relaxed">
                 Your message was saved safely so nothing was lost. Send it directly
                 via your email client to{' '}
-                <strong className="text-[#0B132B]">zeid@orionyouth.eu</strong> or copy
+                <strong className="text-[#F8F9FA]">zeid@orionyouth.eu</strong> or copy
                 the text below.
               </p>
 
-              <div className="border border-[rgba(11,19,43,0.14)] bg-[#F8F9FA] p-5 space-y-2 text-sm">
-                <div className="text-[#0B132B] font-medium">
+              <div className="bg-[#111D3B]/80 border border-white/15 p-5 space-y-2 text-sm">
+                <div className="text-[#F8F9FA] font-medium">
                   Subject: {fallbackMessage.subject}
                 </div>
-                <p className="text-[rgba(11,19,43,0.8)] whitespace-pre-line pt-2 border-t border-[rgba(11,19,43,0.08)]">
+                <p className="text-[#F8F9FA]/85 whitespace-pre-line pt-2 border-t border-white/10">
                   {fallbackMessage.message}
                 </p>
               </div>
@@ -343,19 +343,24 @@ export function TwoModeContactForm() {
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <a
                   href={buildMailtoHref(fallbackMessage)}
-                  className="inline-flex items-center justify-center bg-[#e35619] text-[#0B132B] font-display font-semibold text-sm px-6 py-3.5 rounded-none hover:bg-[#d04b12] transition-colors"
+                  className="inline-flex items-center justify-center bg-[#E35619] text-[#0B132B] font-display font-semibold text-sm px-6 py-3.5 rounded-none hover:bg-[#d04b12] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B132B]"
                 >
                   Open in email client (zeid@orionyouth.eu)
                 </a>
                 <Button
                   variant="secondary"
-                  tone="light"
+                  tone="dark"
                   type="button"
                   onClick={handleCopyFallback}
                 >
                   {copiedFallback ? 'Copied message' : 'Copy message'}
                 </Button>
-                <Button variant="secondary" tone="light" onClick={handleReset}>
+                <Button
+                  variant="secondary"
+                  tone="dark"
+                  type="button"
+                  onClick={handleReset}
+                >
                   Edit or write another
                 </Button>
               </div>
@@ -363,49 +368,54 @@ export function TwoModeContactForm() {
           ) : submittedMessage ? (
             <div
               data-testid="contact-submission-success"
-              className="border border-[rgba(11,19,43,0.15)] p-8 md:p-12 space-y-6"
+              className="bg-[#0B132B] text-[#F8F9FA] border-t-2 border-t-[#E35619] p-8 md:p-10 space-y-6"
             >
-              <div className="flex items-center gap-2 border-b border-[rgba(11,19,43,0.10)] pb-4">
-                <span className="text-xs font-semibold text-[#0B132B] tabular-nums">
+              <div className="flex items-center gap-2 border-b border-white/15 pb-4">
+                <span className="text-xs font-semibold text-[#F8F9FA]/80 tabular-nums">
                   Dispatch recorded (Ref: {submittedMessage.id.slice(0, 8)})
                 </span>
               </div>
 
               {mode === 'participant' ? (
                 <div className="space-y-4">
-                  <h3 className="type-h2 text-[#0B132B]">
+                  <h3 className="type-h2 text-[#F8F9FA]">
                     Message received! We&apos;ve got your back.
                   </h3>
-                  <p className="type-body text-[rgba(11,19,43,0.8)] leading-relaxed">
+                  <p className="type-body text-[#F8F9FA]/85 leading-relaxed">
                     Hey {submittedMessage.name}, thank you for reaching out. One
                     of our youth coordinators in Debrecen will read your message and
-                    reply to <strong className="text-[#0B132B]">{submittedMessage.email}</strong>{' '}
+                    reply to <strong className="text-[#F8F9FA]">{submittedMessage.email}</strong>{' '}
                     shortly.
                   </p>
-                  <p className="type-body text-[rgba(11,19,43,0.8)] leading-relaxed">
+                  <p className="type-body text-[#F8F9FA]/85 leading-relaxed">
                     No question is too small—whether it&apos;s about packing, booking
                     trains, or language fears. You&apos;ve got this!
                   </p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <h3 className="type-h2 text-[#0B132B]">
+                  <h3 className="type-h2 text-[#F8F9FA]">
                     Institutional inquiry registered
                   </h3>
-                  <p className="type-body text-[rgba(11,19,43,0.8)] leading-relaxed">
+                  <p className="type-body text-[#F8F9FA]/85 leading-relaxed">
                     Thank you, {submittedMessage.name}. Your correspondence has been
                     routed to the Orion international coordination board.
                   </p>
-                  <p className="type-body text-[rgba(11,19,43,0.8)] leading-relaxed">
+                  <p className="type-body text-[#F8F9FA]/85 leading-relaxed">
                     We will review your inquiry concerning &ldquo;{submittedMessage.subject}&rdquo;{' '}
-                    and respond via <strong className="text-[#0B132B]">{submittedMessage.email}</strong> within
-                    2–3 business days.
+                    and respond via <strong className="text-[#F8F9FA]">{submittedMessage.email}</strong> within{' '}
+                    <span className="tabular-nums">2–3 business days</span>.
                   </p>
                 </div>
               )}
 
-              <div className="pt-4 border-t border-[rgba(11,19,43,0.10)]">
-                <Button variant="secondary" tone="light" onClick={handleReset}>
+              <div className="pt-4 border-t border-white/15">
+                <Button
+                  variant="secondary"
+                  tone="dark"
+                  type="button"
+                  onClick={handleReset}
+                >
                   Send another message
                 </Button>
               </div>
@@ -414,7 +424,7 @@ export function TwoModeContactForm() {
             <form
               onSubmit={handleSubmit}
               noValidate
-              className="border border-[rgba(11,19,43,0.15)] bg-white p-6 md:p-10 space-y-6"
+              className="border-t-2 border-t-[#0B132B] bg-white border-x border-b border-[rgba(11,19,43,0.10)] p-6 md:p-10 space-y-6"
             >
               <input
                 type="text"
@@ -451,7 +461,7 @@ export function TwoModeContactForm() {
                     <div className="pt-1">
                       <Link
                         href="/partners"
-                        className="inline-flex items-center gap-1.5 text-xs text-[#0B132B] underline hover:text-[#e35619] transition-colors"
+                        className="inline-flex items-center gap-1.5 text-xs text-[#0B132B] underline hover:text-[#e35619] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2"
                       >
                         <span>View complete institutional dossier &amp; credentials</span>
                       </Link>
@@ -482,6 +492,8 @@ export function TwoModeContactForm() {
                   type="text"
                   id="contact-name"
                   name="name"
+                  autoComplete="name"
+                  enterKeyHint="next"
                   value={formData.name || ''}
                   onChange={handleChange}
                   aria-required="true"
@@ -492,7 +504,7 @@ export function TwoModeContactForm() {
                       ? 'e.g. Bence Varga'
                       : 'e.g. Dr. Maria Kovács, Head of Projects'
                   }
-                  className={`w-full h-12 px-3 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                  className={`w-full h-12 min-h-[48px] px-3 bg-white border text-[#0B132B] font-body text-base rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 focus:border-[#0B132B] ${
                     errors.name
                       ? 'border-[#B91C1C]'
                       : 'border-[rgba(11,19,43,0.26)]'
@@ -520,6 +532,11 @@ export function TwoModeContactForm() {
                   type="email"
                   id="contact-email"
                   name="email"
+                  autoComplete="email"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  enterKeyHint="next"
                   value={formData.email || ''}
                   onChange={handleChange}
                   aria-required="true"
@@ -530,7 +547,7 @@ export function TwoModeContactForm() {
                       ? 'e.g. bence@example.hu'
                       : 'e.g. maria.kovacs@youth-ngo.eu'
                   }
-                  className={`w-full h-12 px-3 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                  className={`w-full h-12 min-h-[48px] px-3 bg-white border text-[#0B132B] font-body text-base rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 focus:border-[#0B132B] ${
                     errors.email
                       ? 'border-[#B91C1C]'
                       : 'border-[rgba(11,19,43,0.26)]'
@@ -558,6 +575,7 @@ export function TwoModeContactForm() {
                   type="text"
                   id="contact-subject"
                   name="subject"
+                  enterKeyHint="next"
                   value={formData.subject || ''}
                   onChange={handleChange}
                   aria-required="true"
@@ -568,7 +586,7 @@ export function TwoModeContactForm() {
                       ? 'e.g. Question about travel reimbursement for Portugal'
                       : 'e.g. KA210 Small-scale partnership mandate invitation'
                   }
-                  className={`w-full h-12 px-3 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                  className={`w-full h-12 min-h-[48px] px-3 bg-white border text-[#0B132B] font-body text-base rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 focus:border-[#0B132B] ${
                     errors.subject
                       ? 'border-[#B91C1C]'
                       : 'border-[rgba(11,19,43,0.26)]'
@@ -606,7 +624,7 @@ export function TwoModeContactForm() {
                       ? 'Tell us what you are wondering about! Are you nervous about speaking English, or curious about the venue?'
                       : 'Please outline your inquiry, partner profile, or collaboration objectives.'
                   }
-                  className={`w-full p-3 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                  className={`w-full min-h-[48px] p-3 bg-white border text-[#0B132B] font-body text-base rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 focus:border-[#0B132B] ${
                     errors.message
                       ? 'border-[#B91C1C]'
                       : 'border-[rgba(11,19,43,0.26)]'
@@ -639,48 +657,68 @@ export function TwoModeContactForm() {
           )}
         </div>
 
-        {/* Sidebar Column (5 cols): HQ Contact block + ParticipantFaq */}
-        <div className="lg:col-span-5 space-y-8">
-          {/* HQ Contact Ledger Block */}
-          <div className="border border-[rgba(11,19,43,0.15)] p-6 md:p-8 space-y-5">
-            <div className="border-b border-[rgba(11,19,43,0.08)] pb-4">
-              <span className="text-xs font-medium text-[rgba(11,19,43,0.68)]">
+        {/* Sidebar Column (5 cols): HQ Anchor Dock + ParticipantFaq */}
+        <div className="lg:col-span-5 min-w-0 space-y-8">
+          {/* Headquarters Anchor Dock */}
+          <div className="bg-[#0B132B] text-[#F8F9FA] border-t-2 border-t-[#E35619] relative overflow-hidden p-6 md:p-8 space-y-5">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 120 120"
+              className="pointer-events-none absolute top-0 right-0 w-28 h-28 opacity-25"
+              fill="none"
+            >
+              <circle cx="92" cy="24" r="1.5" fill="#E35619" />
+              <circle cx="72" cy="18" r="1" fill="#F8F9FA" />
+              <circle cx="104" cy="46" r="1" fill="#F8F9FA" />
+              <circle cx="84" cy="42" r="0.8" fill="#F8F9FA" />
+              <circle cx="54" cy="30" r="0.8" fill="#F8F9FA" />
+              <circle cx="96" cy="68" r="0.8" fill="#F8F9FA" />
+              <path
+                d="M72 18L92 24L104 46"
+                stroke="#F8F9FA"
+                strokeOpacity="0.28"
+                strokeWidth="0.6"
+              />
+            </svg>
+
+            <div className="relative border-b border-white/15 pb-4">
+              <span className="text-xs font-medium text-[#F8F9FA]/75">
                 Permanent Anchor
               </span>
-              <h4 className="type-h3 text-[#0B132B] mt-1">Orion Headquarters</h4>
+              <h4 className="type-h3 text-[#F8F9FA] mt-1">Orion Headquarters</h4>
             </div>
 
-            <dl className="space-y-4 text-sm">
-              <div>
-                <dt className="text-xs font-semibold text-[rgba(11,19,43,0.68)]">
+            <dl className="relative divide-y divide-white/10 text-sm">
+              <div className="pb-3.5">
+                <dt className="text-xs font-semibold text-[#F8F9FA]/70">
                   Location
                 </dt>
-                <dd className="mt-1 space-y-1.5">
-                  <span className="block font-semibold text-[#0B132B]">
+                <dd className="mt-1">
+                  <span className="block font-semibold text-[#F8F9FA]">
                     Debrecen, Hungary
                   </span>
                 </dd>
               </div>
 
-              <div>
-                <dt className="text-xs text-[rgba(11,19,43,0.68)] font-semibold">
+              <div className="py-3.5">
+                <dt className="text-xs font-semibold text-[#F8F9FA]/70">
                   Direct Dispatch Email
                 </dt>
                 <dd className="mt-1">
                   <a
                     href="mailto:zeid@orionyouth.eu"
-                    className="text-sm font-semibold text-[#0B132B] underline hover:text-[#e35619] transition-colors"
+                    className="text-sm font-semibold text-[#F8F9FA] underline underline-offset-4 decoration-[#E35619] hover:text-[#F8F9FA]/85 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B132B]"
                   >
                     zeid@orionyouth.eu
                   </a>
                 </dd>
               </div>
 
-              <div>
-                <dt className="text-xs text-[rgba(11,19,43,0.68)] font-semibold">
+              <div className="pt-3.5">
+                <dt className="text-xs font-semibold text-[#F8F9FA]/70">
                   Response Cadence
                 </dt>
-                <dd className="text-xs text-[rgba(11,19,43,0.7)] mt-0.5 tabular-nums">
+                <dd className="text-xs text-[#F8F9FA]/85 mt-1 leading-relaxed tabular-nums">
                   Participant inquiries: ~24–48 hours
                   <br />
                   Institutional proposals: ~2–3 business days
@@ -693,7 +731,7 @@ export function TwoModeContactForm() {
           {mode === 'participant' ? (
             <ParticipantFaq />
           ) : (
-            <div className="border border-[rgba(11,19,43,0.12)] p-6 space-y-3">
+            <div className="border-t-2 border-t-[#E35619] bg-white border-x border-b border-[rgba(11,19,43,0.10)] p-6 space-y-3">
               <h4 className="font-display font-semibold text-[#0B132B]">
                 Looking for structured KA1/KA2 proposals?
               </h4>

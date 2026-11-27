@@ -382,3 +382,20 @@ svg [role="button"]:focus-visible {
     animation: none !important;
   }
 }
+
+/* Progressive-enhancement native <details> FAQ accordion animation */
+.orion-faq-item::details-content {
+  interpolate-size: allow-keywords;
+  overflow: clip;
+  contain: layout;
+}
+
+.orion-faq-item:not([open])::details-content {
+  block-size: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .orion-faq-item::details-content {
+    transition: block-size 0.28s ease-in-out, content-visibility 0.28s ease-in-out allow-discrete;
+  }
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import { PartnerInquiry } from '@/types/orion';
 import { partnerInquiryRepository, validatePartnerInquiry } from '@/lib/storage';
 import { Button } from '@/components/ui/Button';
@@ -231,23 +232,104 @@ export function InstitutionalDossier() {
 
   return (
     <div className="space-y-20 md:space-y-28">
-      {/* Verbatim Lead Paragraph & Partnership Introduction */}
-      <section className="space-y-6 max-w-4xl">
-        <p className="type-body-lg text-xl md:text-2xl text-[#0B132B] font-medium leading-relaxed">
-          Orion is an international youth initiative that turns participation into
-          memories, growth, and human connection. Guided by the idea of a
-          constellation of young changemakers who help each other navigate and move
-          upward, we create programs that deliver measurable personal and
-          cross-cultural impact.
-        </p>
+      {/* Verbatim Lead Paragraph & Partnership Introduction with Consortium Star Crest */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="lg:col-span-8 min-w-0 space-y-6">
+          <p className="type-body-lg text-xl md:text-2xl text-[#0B132B] font-medium leading-relaxed">
+            Orion is an international youth initiative that turns participation into
+            memories, growth, and human connection. Guided by the idea of a
+            constellation of young changemakers who help each other navigate and move
+            upward, we create programs that deliver measurable personal and
+            cross-cultural impact.
+          </p>
 
-        <p className="type-body text-[rgba(11,19,43,0.75)] leading-relaxed">
-          Anchored in <strong>Debrecen, Hungary</strong>,{' '}
-          <strong>Orion Fiatalok Informális Csoportja</strong> collaborates with
-          European youth NGOs, grassroots collectives, and educational initiatives on
-          Erasmus+ KA1 Youth Exchanges, youth worker mobilities, and KA2 cooperation
-          partnerships. Use the form below to email our coordination team directly.
-        </p>
+          <p className="type-body text-[rgba(11,19,43,0.75)] leading-relaxed">
+            Anchored in <strong>Debrecen, Hungary</strong>,{' '}
+            <strong>Orion Fiatalok Informális Csoportja</strong> collaborates with
+            European youth NGOs, grassroots collectives, and educational initiatives on
+            Erasmus+ KA1 Youth Exchanges, youth worker mobilities, and KA2 cooperation
+            partnerships. Use the form below to email our coordination team directly.
+          </p>
+        </div>
+
+        {/* Deterministic Consortium Star Crest */}
+        <div className="lg:col-span-4 hidden lg:block">
+          <svg
+            viewBox="0 0 260 190"
+            className="w-full h-auto max-w-[260px] ml-auto"
+            aria-hidden="true"
+            focusable="false"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Outer architectural hairlines and orbital ring */}
+            <circle
+              cx="132"
+              cy="95"
+              r="72"
+              fill="none"
+              stroke="rgba(11,19,43,0.12)"
+              strokeWidth="1"
+            />
+            <circle
+              cx="132"
+              cy="95"
+              r="42"
+              fill="none"
+              stroke="rgba(11,19,43,0.08)"
+              strokeWidth="1"
+              strokeDasharray="3 5"
+            />
+            <line
+              x1="28"
+              y1="95"
+              x2="236"
+              y2="95"
+              stroke="rgba(11,19,43,0.08)"
+              strokeWidth="1"
+            />
+            <line
+              x1="132"
+              y1="14"
+              x2="132"
+              y2="176"
+              stroke="rgba(11,19,43,0.08)"
+              strokeWidth="1"
+            />
+
+            {/* Constellation trajectory hairlines connecting 4 partner nodes to Debrecen anchor */}
+            <g stroke="#0B132B" strokeOpacity="0.28" strokeWidth="1" fill="none">
+              <line x1="66" y1="54" x2="132" y2="95" />
+              <line x1="194" y1="48" x2="132" y2="95" />
+              <line x1="78" y1="144" x2="132" y2="95" />
+              <line x1="202" y1="134" x2="132" y2="95" />
+              <polyline points="66,54 194,48 202,134 78,144 66,54" strokeOpacity="0.14" />
+            </g>
+
+            {/* 4 Partner Consortium Nodes */}
+            <circle cx="66" cy="54" r="3.5" fill="#0B132B" fillOpacity="0.72" />
+            <circle cx="194" cy="48" r="3.5" fill="#0B132B" fillOpacity="0.72" />
+            <circle cx="78" cy="144" r="3.5" fill="#0B132B" fillOpacity="0.72" />
+            <circle cx="202" cy="134" r="3.5" fill="#0B132B" fillOpacity="0.72" />
+
+            {/* Debrecen Anchor Node */}
+            <circle
+              cx="132"
+              cy="95"
+              r="11"
+              fill="none"
+              stroke="#E35619"
+              strokeOpacity="0.4"
+              strokeWidth="1"
+            />
+            <circle
+              cx="132"
+              cy="95"
+              r="5"
+              fill="#E35619"
+              className="belief-bloom"
+            />
+          </svg>
+        </div>
       </section>
 
       {/* Main 12-Column Partner Email Inquiry Hub */}
@@ -257,17 +339,17 @@ export function InstitutionalDossier() {
         className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start border-t border-[rgba(11,19,43,0.12)] pt-12"
       >
         {/* Left 7 Columns: Partner Email Inquiry Form */}
-        <div className="lg:col-span-7">
+        <div className="lg:col-span-7 min-w-0">
           {submittedInquiry ? (
             <div
               data-testid="partner-inquiry-confirmation"
-              className="border border-[rgba(11,19,43,0.15)] bg-white p-8 md:p-10 space-y-6"
+              className="bg-[#0B132B] text-[#F8F9FA] border-t-2 border-t-[#E35619] p-8 md:p-10 space-y-6"
             >
-              <div className="border-b border-[rgba(11,19,43,0.12)] pb-4">
-                <span className="text-xs font-semibold text-[#0B132B] tabular-nums">
+              <div className="border-b border-white/15 pb-4">
+                <span className="text-xs font-semibold text-[#F8F9FA] tabular-nums">
                   Inquiry recorded, reference {submittedInquiry.id.slice(0, 8)}
                 </span>
-                <h2 className="type-h2 text-[#0B132B] mt-1">
+                <h2 className="type-h2 text-[#F8F9FA] mt-1">
                   {deliveryMode === 'resend'
                     ? 'Partnership inquiry dispatched'
                     : 'Partnership inquiry ready for dispatch'}
@@ -275,50 +357,50 @@ export function InstitutionalDossier() {
               </div>
 
               {deliveryMode === 'resend' ? (
-                <p className="type-body text-[rgba(11,19,43,0.85)] leading-relaxed">
-                  Thank you, <strong className="text-[#0B132B]">{submittedInquiry.contactPerson}</strong>.
+                <p className="type-body text-[rgba(248,249,250,0.85)] leading-relaxed">
+                  Thank you, <strong className="text-[#F8F9FA]">{submittedInquiry.contactPerson}</strong>.
                   Your inquiry on behalf of{' '}
-                  <strong className="text-[#0B132B]">{submittedInquiry.organizationName}</strong>{' '}
+                  <strong className="text-[#F8F9FA]">{submittedInquiry.organizationName}</strong>{' '}
                   ({submittedInquiry.country}) has been delivered directly to{' '}
-                  <strong className="text-[#0B132B]">zeid@orionyouth.eu</strong>. Our
+                  <strong className="text-[#F8F9FA]">zeid@orionyouth.eu</strong>. Our
                   coordination desk typically responds within ~2 business days.
                 </p>
               ) : (
-                <p className="type-body text-[rgba(11,19,43,0.85)] leading-relaxed">
-                  Thank you, <strong className="text-[#0B132B]">{submittedInquiry.contactPerson}</strong>.
+                <p className="type-body text-[rgba(248,249,250,0.85)] leading-relaxed">
+                  Thank you, <strong className="text-[#F8F9FA]">{submittedInquiry.contactPerson}</strong>.
                   Your inquiry on behalf of{' '}
-                  <strong className="text-[#0B132B]">{submittedInquiry.organizationName}</strong>{' '}
+                  <strong className="text-[#F8F9FA]">{submittedInquiry.organizationName}</strong>{' '}
                   ({submittedInquiry.country}) has been saved. Click below to open your
                   email client with the pre-addressed dispatch to{' '}
-                  <strong className="text-[#0B132B]">zeid@orionyouth.eu</strong>, or copy
+                  <strong className="text-[#F8F9FA]">zeid@orionyouth.eu</strong>, or copy
                   the preview for your records.
                 </p>
               )}
 
               {/* Message Preview Box */}
-              <div className="border border-[rgba(11,19,43,0.14)] bg-[#F8F9FA] p-5 space-y-2 text-sm">
-                <div className="text-xs font-semibold text-[rgba(11,19,43,0.6)]">
+              <div className="bg-[#111D3B]/80 border border-white/15 p-5 space-y-2 text-sm">
+                <div className="text-xs font-semibold text-[rgba(248,249,250,0.65)]">
                   Prepared email preview
                 </div>
-                <div className="text-[#0B132B] font-medium">
+                <div className="text-[#F8F9FA] font-medium">
                   To: zeid@orionyouth.eu
                 </div>
-                <div className="text-[#0B132B] font-medium">
+                <div className="text-[#F8F9FA] font-medium">
                   Topic: {submittedInquiry.topic}
                 </div>
-                <p className="text-[rgba(11,19,43,0.8)] whitespace-pre-line pt-2 border-t border-[rgba(11,19,43,0.08)]">
+                <p className="text-[rgba(248,249,250,0.85)] whitespace-pre-line pt-2 border-t border-white/10">
                   {submittedInquiry.message}
                 </p>
               </div>
 
               {deliveryMode === 'resend' ? (
                 <div className="flex flex-wrap items-center gap-4 pt-2">
-                  <Button variant="secondary" tone="light" onClick={handleReset}>
+                  <Button variant="secondary" tone="dark" onClick={handleReset}>
                     Write another inquiry
                   </Button>
                   <a
                     href={buildMailtoHref(submittedInquiry)}
-                    className="text-xs font-semibold text-[#0B132B] underline hover:text-[#e35619] transition-colors"
+                    className="text-xs font-semibold text-[#F8F9FA] underline underline-offset-4 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B132B]"
                   >
                     Open in email client (zeid@orionyouth.eu)
                   </a>
@@ -327,14 +409,14 @@ export function InstitutionalDossier() {
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <a
                     href={buildMailtoHref(submittedInquiry)}
-                    className="inline-flex items-center justify-center bg-[#e35619] text-[#0B132B] font-display font-semibold text-sm px-6 py-3.5 rounded-none hover:bg-[#d04b12] transition-colors"
+                    className="inline-flex items-center justify-center bg-[#E35619] text-[#0B132B] font-display font-bold text-sm px-6 py-3.5 rounded-none hover:bg-[#d04b12] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B132B]"
                   >
                     Open in email client (zeid@orionyouth.eu)
                   </a>
-                  <Button variant="secondary" tone="light" type="button" onClick={handleCopyInquiry}>
+                  <Button variant="secondary" tone="dark" type="button" onClick={handleCopyInquiry}>
                     {copiedInquiry ? 'Copied inquiry text' : 'Copy inquiry text'}
                   </Button>
-                  <Button variant="secondary" tone="light" onClick={handleReset}>
+                  <Button variant="secondary" tone="dark" onClick={handleReset}>
                     Write another inquiry
                   </Button>
                 </div>
@@ -344,7 +426,7 @@ export function InstitutionalDossier() {
             <form
               onSubmit={handleSubmit}
               noValidate
-              className="border border-[rgba(11,19,43,0.15)] bg-[#F8F9FA] p-6 md:p-10 space-y-6"
+              className="border-t-2 border-t-[#0B132B] bg-white border-x border-b border-[rgba(11,19,43,0.10)] p-6 md:p-10 space-y-6"
             >
               <input
                 type="text"
@@ -394,13 +476,15 @@ export function InstitutionalDossier() {
                     name="organizationName"
                     value={formData.organizationName}
                     onChange={handleChange}
+                    autoComplete="organization"
+                    enterKeyHint="next"
                     aria-required="true"
                     aria-invalid={Boolean(errors.organizationName)}
                     aria-describedby={
                       errors.organizationName ? 'err-partner-org' : undefined
                     }
                     placeholder="e.g. Asociación Aurora"
-                    className={`w-full h-12 px-3.5 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                    className={`w-full h-12 min-h-[48px] px-3.5 bg-white border text-[#0B132B] font-body text-base rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 focus:border-[#0B132B] ${
                       errors.organizationName
                         ? 'border-[#B91C1C]'
                         : 'border-[rgba(11,19,43,0.26)]'
@@ -430,13 +514,15 @@ export function InstitutionalDossier() {
                     name="country"
                     value={formData.country}
                     onChange={handleChange}
+                    autoComplete="country-name"
+                    enterKeyHint="next"
                     aria-required="true"
                     aria-invalid={Boolean(errors.country)}
                     aria-describedby={
                       errors.country ? 'err-partner-country' : undefined
                     }
                     placeholder="e.g. Spain"
-                    className={`w-full h-12 px-3.5 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                    className={`w-full h-12 min-h-[48px] px-3.5 bg-white border text-[#0B132B] font-body text-base rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 focus:border-[#0B132B] ${
                       errors.country
                         ? 'border-[#B91C1C]'
                         : 'border-[rgba(11,19,43,0.26)]'
@@ -466,13 +552,15 @@ export function InstitutionalDossier() {
                     name="contactPerson"
                     value={formData.contactPerson}
                     onChange={handleChange}
+                    autoComplete="name"
+                    enterKeyHint="next"
                     aria-required="true"
                     aria-invalid={Boolean(errors.contactPerson)}
                     aria-describedby={
                       errors.contactPerson ? 'err-partner-contact' : undefined
                     }
                     placeholder="e.g. Sofia Ruiz"
-                    className={`w-full h-12 px-3.5 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                    className={`w-full h-12 min-h-[48px] px-3.5 bg-white border text-[#0B132B] font-body text-base rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 focus:border-[#0B132B] ${
                       errors.contactPerson
                         ? 'border-[#B91C1C]'
                         : 'border-[rgba(11,19,43,0.26)]'
@@ -502,13 +590,18 @@ export function InstitutionalDossier() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
+                    autoComplete="email"
+                    autoCorrect="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    enterKeyHint="next"
                     aria-required="true"
                     aria-invalid={Boolean(errors.email)}
                     aria-describedby={
                       errors.email ? 'err-partner-email' : undefined
                     }
                     placeholder="e.g. sofia@aurora-youth.es"
-                    className={`w-full h-12 px-3.5 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                    className={`w-full h-12 min-h-[48px] px-3.5 bg-white border text-[#0B132B] font-body text-base rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 focus:border-[#0B132B] ${
                       errors.email
                         ? 'border-[#B91C1C]'
                         : 'border-[rgba(11,19,43,0.26)]'
@@ -539,13 +632,14 @@ export function InstitutionalDossier() {
                   name="topic"
                   value={formData.topic}
                   onChange={handleChange}
+                  enterKeyHint="next"
                   aria-required="true"
                   aria-invalid={Boolean(errors.topic)}
                   aria-describedby={
                     errors.topic ? 'err-partner-topic' : undefined
                   }
                   placeholder="e.g. KA152 Youth Exchange consortium invitation"
-                  className={`w-full h-12 px-3.5 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                  className={`w-full h-12 min-h-[48px] px-3.5 bg-white border text-[#0B132B] font-body text-base rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 focus:border-[#0B132B] ${
                     errors.topic
                       ? 'border-[#B91C1C]'
                       : 'border-[rgba(11,19,43,0.26)]'
@@ -582,7 +676,7 @@ export function InstitutionalDossier() {
                     errors.message ? 'err-partner-message' : undefined
                   }
                   placeholder="Tell us about your project concept, target timeline, and proposed role for Orion..."
-                  className={`w-full p-3.5 bg-white border text-[#0B132B] font-body text-sm rounded-none focus-visible:outline-none focus:border-[#0B132B] focus:ring-1 focus:ring-[#0B132B] ${
+                  className={`w-full min-h-[48px] p-3.5 bg-white border text-[#0B132B] font-body text-base rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 focus:border-[#0B132B] ${
                     errors.message
                       ? 'border-[#B91C1C]'
                       : 'border-[rgba(11,19,43,0.26)]'
@@ -612,83 +706,102 @@ export function InstitutionalDossier() {
           )}
         </div>
 
-        {/* Right 5 Columns: Direct Dispatch Side Panel */}
-        <aside className="lg:col-span-5 space-y-6">
-          <div className="border border-[rgba(11,19,43,0.15)] bg-white p-6 md:p-8 space-y-6">
-            <div className="border-b border-[rgba(11,19,43,0.12)] pb-4">
-              <span className="text-xs font-semibold text-[rgba(11,19,43,0.6)] block">
-                Direct dispatch
-              </span>
-              <h3 className="type-h3 text-[#0B132B] mt-1">
-                Coordination desk
-              </h3>
+        {/* Right 5 Columns: Coordination Desk Dock */}
+        <aside className="lg:col-span-5 bg-[#0B132B] text-[#F8F9FA] border-t-2 border-t-[#E35619] relative overflow-hidden p-6 md:p-8 space-y-6 lg:sticky lg:top-24">
+          {/* Subtle deterministic corner stardust SVG */}
+          <svg
+            viewBox="0 0 140 140"
+            className="pointer-events-none select-none absolute top-0 right-0 w-32 h-32 opacity-45"
+            aria-hidden="true"
+            focusable="false"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="110" cy="24" r="1.2" fill="#F8F9FA" fillOpacity="0.65" />
+            <circle cx="84" cy="18" r="0.9" fill="#F8F9FA" fillOpacity="0.4" />
+            <circle cx="122" cy="52" r="1" fill="#F8F9FA" fillOpacity="0.5" />
+            <circle cx="96" cy="44" r="0.8" fill="#F8F9FA" fillOpacity="0.35" />
+            <circle cx="62" cy="30" r="0.9" fill="#F8F9FA" fillOpacity="0.3" />
+            <path
+              d="M 48 0 A 92 92 0 0 0 140 92"
+              fill="none"
+              stroke="rgba(248,249,250,0.14)"
+              strokeWidth="1"
+            />
+          </svg>
+
+          <div className="relative z-10 border-b border-white/15 pb-4">
+            <span className="text-xs font-semibold text-[rgba(248,249,250,0.68)] block">
+              Direct dispatch
+            </span>
+            <h3 className="type-h3 text-[#F8F9FA] mt-1">
+              Coordination desk
+            </h3>
+          </div>
+
+          <dl className="relative z-10 divide-y divide-white/10 text-sm">
+            <div className="pt-3 first:pt-0 pb-3 last:pb-0">
+              <dt className="text-xs font-semibold text-[rgba(248,249,250,0.65)]">
+                Organisation
+              </dt>
+              <dd className="text-[#F8F9FA] font-semibold mt-0.5">
+                Orion Fiatalok Informális Csoportja
+              </dd>
             </div>
 
-            <dl className="space-y-4 text-sm">
-              <div>
-                <dt className="text-xs font-semibold text-[rgba(11,19,43,0.6)]">
-                  Organisation
-                </dt>
-                <dd className="text-[#0B132B] font-semibold mt-0.5">
-                  Orion Fiatalok Informális Csoportja
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-xs font-semibold text-[rgba(11,19,43,0.6)]">
-                  Base location
-                </dt>
-                <dd className="text-[#0B132B] font-medium mt-0.5">
-                  Debrecen, Hungary
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-xs font-semibold text-[rgba(11,19,43,0.6)]">
-                  Primary Coordinator
-                </dt>
-                <dd className="text-[#0B132B] font-semibold mt-0.5">
-                  Zeid Isaac
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-xs font-semibold text-[rgba(11,19,43,0.6)]">
-                  Direct Email
-                </dt>
-                <dd className="mt-0.5">
-                  <a
-                    href="mailto:zeid@orionyouth.eu"
-                    className="font-semibold text-[#0B132B] underline hover:text-[#e35619] transition-colors"
-                  >
-                    zeid@orionyouth.eu
-                  </a>
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-xs font-semibold text-[rgba(11,19,43,0.6)]">
-                  Active Grant Reference
-                </dt>
-                <dd className="text-[#0B132B] font-semibold tabular-nums mt-0.5">
-                  2026-1-HU01-KA152-YOU-000399636
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-xs font-semibold text-[rgba(11,19,43,0.6)]">
-                  Response cadence
-                </dt>
-                <dd className="text-[#0B132B] font-medium tabular-nums mt-0.5">
-                  ~2 business days
-                </dd>
-              </div>
-            </dl>
-
-            <div className="border-t border-[rgba(11,19,43,0.12)] pt-4 text-xs text-[rgba(11,19,43,0.75)] leading-relaxed">
-              Complete institutional registration details and signed partner
-              mandates are exchanged directly upon inquiry.
+            <div className="pt-3 first:pt-0 pb-3 last:pb-0">
+              <dt className="text-xs font-semibold text-[rgba(248,249,250,0.65)]">
+                Base location
+              </dt>
+              <dd className="text-[#F8F9FA] font-medium mt-0.5">
+                Debrecen, Hungary
+              </dd>
             </div>
+
+            <div className="pt-3 first:pt-0 pb-3 last:pb-0">
+              <dt className="text-xs font-semibold text-[rgba(248,249,250,0.65)]">
+                Primary Coordinator
+              </dt>
+              <dd className="text-[#F8F9FA] font-semibold mt-0.5">
+                Zeid Isaac
+              </dd>
+            </div>
+
+            <div className="pt-3 first:pt-0 pb-3 last:pb-0">
+              <dt className="text-xs font-semibold text-[rgba(248,249,250,0.65)]">
+                Direct Email
+              </dt>
+              <dd className="mt-0.5">
+                <a
+                  href="mailto:zeid@orionyouth.eu"
+                  className="font-semibold text-[#F8F9FA] underline underline-offset-4 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B132B]"
+                >
+                  zeid@orionyouth.eu
+                </a>
+              </dd>
+            </div>
+
+            <div className="pt-3 first:pt-0 pb-3 last:pb-0">
+              <dt className="text-xs font-semibold text-[rgba(248,249,250,0.65)]">
+                Active Grant Reference
+              </dt>
+              <dd className="text-[#F8F9FA] font-semibold tabular-nums mt-0.5">
+                2026-1-HU01-KA152-YOU-000399636
+              </dd>
+            </div>
+
+            <div className="pt-3 first:pt-0 pb-3 last:pb-0">
+              <dt className="text-xs font-semibold text-[rgba(248,249,250,0.65)]">
+                Response cadence
+              </dt>
+              <dd className="text-[#F8F9FA] font-medium tabular-nums mt-0.5">
+                ~2 business days
+              </dd>
+            </div>
+          </dl>
+
+          <div className="relative z-10 border-t border-white/15 pt-4 text-xs text-[rgba(248,249,250,0.75)] leading-relaxed">
+            Complete institutional registration details and signed partner
+            mandates are exchanged directly upon inquiry.
           </div>
         </aside>
       </section>
@@ -700,7 +813,10 @@ export function InstitutionalDossier() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 text-sm">
-          <div className="space-y-2.5">
+          <div className="border-t border-[rgba(11,19,43,0.12)] pt-5 space-y-2.5">
+            <span className="text-[#E35619] font-display font-bold text-sm tabular-nums block">
+              01
+            </span>
             <h3 className="type-h3 text-[#0B132B] text-lg md:text-xl">
               Youth exchanges and worker mobility
             </h3>
@@ -711,7 +827,10 @@ export function InstitutionalDossier() {
             </p>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="border-t border-[rgba(11,19,43,0.12)] pt-5 space-y-2.5">
+            <span className="text-[#E35619] font-display font-bold text-sm tabular-nums block">
+              02
+            </span>
             <h3 className="type-h3 text-[#0B132B] text-lg md:text-xl">
               Inclusion and diversity
             </h3>
@@ -722,7 +841,10 @@ export function InstitutionalDossier() {
             </p>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="border-t border-[rgba(11,19,43,0.12)] pt-5 space-y-2.5">
+            <span className="text-[#E35619] font-display font-bold text-sm tabular-nums block">
+              03
+            </span>
             <h3 className="type-h3 text-[#0B132B] text-lg md:text-xl">
               Youthpass and safeguarding
             </h3>
@@ -735,24 +857,51 @@ export function InstitutionalDossier() {
         </div>
       </section>
 
-      {/* Partnership Track Record — Concise Prose Section */}
-      <section className="space-y-6 border-t border-[rgba(11,19,43,0.10)] pt-16">
+      {/* Partnership Track Record — 2-Column Dossier */}
+      <section className="space-y-8 border-t border-[rgba(11,19,43,0.10)] pt-16">
         <h2 className="type-h2 text-[#0B132B]">Partnership track record</h2>
-        <div className="max-w-3xl space-y-4 type-body text-[#0B132B] leading-relaxed">
-          <p>
-            Orion’s verified track record includes <strong>ReForest</strong>, a
-            4-country Erasmus+ Youth Exchange (October 11–22, 2026) at Lacu Roșu
-            Mountain Lodge in Harghita County, Romania, hosted by{' '}
-            <em>Asociația Agoje</em> alongside <em>AzorEarth</em> (Portugal) and{' '}
-            <em>Youth Group Novae</em> (Czechia).
-          </p>
-          <p>
-            Our upcoming hosted initiative <strong>The Financial Blueprint</strong>{' '}
-            (scheduled for March 2027 at Location TBA, Hungary) brings together 32
-            young people aged 18–26 across Hungary, Romania, Spain, and Czechia
-            under accredited grant{' '}
-            <code className="tabular-nums">2026-1-HU01-KA152-YOU-000399636</code>.
-          </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+          <div className="border-t border-[rgba(11,19,43,0.12)] pt-5 space-y-3">
+            <span className="text-xs font-semibold text-[#E35619] tabular-nums block">
+              2026
+            </span>
+            <p className="type-body text-[#0B132B] leading-relaxed">
+              Orion’s verified track record includes <strong>ReForest</strong>, a
+              4-country Erasmus+ Youth Exchange (October 11–22, 2026) at Lacu Roșu
+              Mountain Lodge in Harghita County, Romania, hosted by{' '}
+              <em>Asociația Agoje</em> alongside <em>AzorEarth</em> (Portugal) and{' '}
+              <em>Youth Group Novae</em> (Czechia).
+            </p>
+            <div>
+              <Link
+                href="/projects/reforest"
+                className="inline-flex items-center text-xs font-semibold text-[#0B132B] underline underline-offset-4 hover:text-[#E35619] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2"
+              >
+                View ReForest archive
+              </Link>
+            </div>
+          </div>
+
+          <div className="border-t border-[rgba(11,19,43,0.12)] pt-5 space-y-3">
+            <span className="text-xs font-semibold text-[#E35619] tabular-nums block">
+              2027
+            </span>
+            <p className="type-body text-[#0B132B] leading-relaxed">
+              Our upcoming hosted initiative <strong>The Financial Blueprint</strong>{' '}
+              (scheduled for March 2027 at Location TBA, Hungary) brings together 32
+              young people aged 18–26 across Hungary, Romania, Spain, and Czechia
+              under accredited grant{' '}
+              <code className="tabular-nums">2026-1-HU01-KA152-YOU-000399636</code>.
+            </p>
+            <div>
+              <Link
+                href="/projects/the-financial-blueprint"
+                className="inline-flex items-center text-xs font-semibold text-[#0B132B] underline underline-offset-4 hover:text-[#E35619] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2"
+              >
+                View Financial Blueprint
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </div>

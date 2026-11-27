@@ -34,6 +34,21 @@ export default function PartnersPage() {
         eyebrow="Consortium & mobility inquiries"
         title="Partner with Orion Fiatalok Informális Csoportja"
         lead="Direct Erasmus+ KA1 and KA2 consortium coordination for European youth NGOs, grassroots collectives, and educational initiatives."
+        aside={
+          <div className="bg-[#111D3B]/65 backdrop-blur-md border border-[rgba(248,249,250,0.14)] border-t-[rgba(248,249,250,0.22)] p-5 text-xs text-[rgba(248,249,250,0.85)] space-y-2 tabular-nums">
+            <div className="font-semibold text-[#F8F9FA]">Consortium Desk</div>
+            <div>Debrecen, Hungary</div>
+            <div>
+              <a
+                href="mailto:zeid@orionyouth.eu"
+                className="underline underline-offset-4 hover:text-[#F8F9FA] transition-colors"
+              >
+                zeid@orionyouth.eu
+              </a>
+            </div>
+            <div>Response: ~2 business days</div>
+          </div>
+        }
       />
       <MotionTrailDivider from="navy" to="offwhite" height={56} />
 

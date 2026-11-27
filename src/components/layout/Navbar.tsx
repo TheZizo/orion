@@ -88,7 +88,7 @@ export function Navbar() {
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#0B132B] border-b border-[rgba(248,249,250,0.14)]">
+    <header className="sticky top-0 z-50 w-full bg-[#0B132B]/90 backdrop-blur-md supports-[backdrop-filter]:bg-[#0B132B]/85 border-b border-[rgba(248,249,250,0.14)]">
       <div className="container-orion flex items-center justify-between h-16 md:h-20">
         {/* Brand Wordmark & Mark */}
         <Link

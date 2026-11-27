@@ -669,6 +669,8 @@ export function CelestialAtlas({
             if (!data) return null;
             const isSelected = activeNode?.id === node.id;
             const isBlueprint = node.id === 'call-the-financial-blueprint';
+            const depthOpacity = Math.max(0.7, Math.min(1, 0.9 - data.pos.depth / 1200));
+            const nodeScale = Math.max(0.92, Math.min(1.1, data.pos.scale));
 
             return (
               <g
@@ -680,6 +682,7 @@ export function CelestialAtlas({
                 onClick={() => handleSelectNode(node)}
                 onKeyDown={(e) => handleKeyDown(e, node)}
                 transform={`translate(${data.pos.x}, ${data.pos.y})`}
+                opacity={isSelected ? 1 : depthOpacity}
               >
                 {/* 44x44 Touch Target */}
                 <circle cx="0" cy="0" r="24" fill="transparent" />
@@ -707,31 +710,33 @@ export function CelestialAtlas({
                   />
                 )}
 
-                {isBlueprint ? (
-                  /* The Financial Blueprint — Primary Ember Star */
-                  <g>
-                    <circle cx="0" cy="0" r="26" fill="url(#blueprintEmberAura)" />
-                    <circle cx="0" cy="0" r="14" fill="#0B132B" stroke="#E35619" strokeWidth="1.75" />
-                    <g transform="translate(-12, -12)">
-                      <SparkleStar size={24} color="#E35619" pulse={!prefersReducedMotion} />
+                <g transform={`scale(${nodeScale})`}>
+                  {isBlueprint ? (
+                    /* The Financial Blueprint — Primary Ember Star */
+                    <g>
+                      <circle cx="0" cy="0" r="26" fill="url(#blueprintEmberAura)" />
+                      <circle cx="0" cy="0" r="14" fill="#0B132B" stroke="#E35619" strokeWidth="1.75" />
+                      <g transform="translate(-12, -12)">
+                        <SparkleStar size={24} color="#E35619" pulse={!prefersReducedMotion} />
+                      </g>
                     </g>
-                  </g>
-                ) : (
-                  /* Other Orbital Nodes */
-                  <g>
-                    <circle
-                      cx="0"
-                      cy="0"
-                      r="13"
-                      fill="#111D3B"
-                      stroke={isSelected ? '#E35619' : 'rgba(248,249,250,0.6)'}
-                      strokeWidth={isSelected ? '1.5' : '1.25'}
-                    />
-                    <g transform="translate(-9, -9)">
-                      <SparkleStar size={18} color={isSelected ? '#E35619' : '#F8F9FA'} />
+                  ) : (
+                    /* Other Orbital Nodes */
+                    <g>
+                      <circle
+                        cx="0"
+                        cy="0"
+                        r="13"
+                        fill="#111D3B"
+                        stroke={isSelected ? '#E35619' : 'rgba(248,249,250,0.6)'}
+                        strokeWidth={isSelected ? '1.5' : '1.25'}
+                      />
+                      <g transform="translate(-9, -9)">
+                        <SparkleStar size={18} color={isSelected ? '#E35619' : '#F8F9FA'} />
+                      </g>
                     </g>
-                  </g>
-                )}
+                  )}
+                </g>
 
                 {renderNodeLabel(node.id, data)}
               </g>
@@ -740,7 +745,7 @@ export function CelestialAtlas({
         </svg>
 
         {/* Quiet Caption: Text Tabs Row + Editorial NodeInspector */}
-        <div className="mt-4 pt-3 border-t border-[rgba(248,249,250,0.12)]">
+        <div className="mt-4 bg-[#111D3B]/65 backdrop-blur-md border border-[rgba(248,249,250,0.14)] border-t-[rgba(248,249,250,0.22)] px-5 py-4">
           {/* Plain Text Tab Strip */}
           <div
             role="tablist"

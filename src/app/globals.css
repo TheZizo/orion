@@ -229,6 +229,142 @@ svg [role="button"]:focus-visible {
 }
 
 /* ==========================================================================
+   Living Star Chart (Beliefs Observatory)
+   Static final states by default; animations opt-in only under no-preference
+   ========================================================================== */
+@keyframes belief-draw {
+  from {
+    stroke-dashoffset: var(--trace-len, 320);
+    opacity: 0.25;
+  }
+  to {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes belief-compass-lock {
+  0% {
+    transform: rotate(-48deg);
+  }
+  65% {
+    transform: rotate(5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes belief-node-bloom {
+  from {
+    transform: scale(0.35);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes belief-ripple {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@keyframes belief-slow-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes belief-orbit-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes belief-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.belief-trace {
+  stroke-dasharray: var(--trace-len, 320);
+  stroke-dashoffset: 0;
+}
+
+.belief-compass {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.belief-bloom {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.belief-ripple {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.28;
+}
+
+.belief-spin-slow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.belief-float {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.belief-timer-bar {
+  transform-origin: left center;
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .belief-trace {
+    animation: belief-draw 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .belief-compass {
+    animation: belief-compass-lock 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .belief-bloom {
+    animation: belief-node-bloom 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .belief-ripple {
+    animation: belief-ripple 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+  .belief-spin-slow {
+    animation: belief-slow-spin 36s linear infinite;
+  }
+  .belief-float {
+    animation: belief-orbit-float 4s ease-in-out infinite;
+  }
+  .belief-timer-bar {
+    animation: belief-progress 5.2s linear forwards;
+  }
+}
+
+/* ==========================================================================
    Prefers Reduced Motion Handling
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {

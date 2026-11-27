@@ -13,9 +13,10 @@ const FALLBACK_IMPACT_METRICS = [
 /**
  * ReForestStory Component — Daylight Editorial Spread (#F8F9FA)
  *
- * Position #1 post-hero high-contrast 12-column editorial spread:
- * - Left 7 cols: Documentary Visual Frame (/reforest-2.jpg) with coordinate badge and caption bar
- * - Right 5 cols: Memories, Proof & Story, Kemal quote, 2x2 Architectural Impact Grid, Action buttons
+ * 3-tier cinematic documentary spread:
+ * - Tier 1: Full-width panoramic lead photo (/reforest-2.jpg) with coordinate badge
+ * - Tier 2: Open oversized display metrics ribbon directly on #F8F9FA
+ * - Tier 3: Asymmetric 12-col story (kicker, H2, Kemal quote, action links) & sapling fieldwork photo (/reforest-3.jpg)
  */
 export function ReForestStory() {
   const quote = {
@@ -30,52 +31,55 @@ export function ReForestStory() {
 
   return (
     <section className="w-full bg-[#F8F9FA] text-[#0B132B] py-20 md:py-28 border-b border-[rgba(11,19,43,0.10)]">
-      <div className="container-orion">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          {/* Left 7 Columns: Documentary Visual Frame */}
-          <div className="lg:col-span-7">
-            <div className="aspect-[16/10] relative overflow-hidden border border-[rgba(11,19,43,0.12)] bg-[#0B132B]">
-              <Image
-                src="/images/projects/reforest-2.jpg"
-                alt="All 40 international youth participants and 8 team leaders of ReForest holding official European Union and project banners on an alpine meadow in Lacu Roșu, Romania"
-                fill
-                sizes="(max-width: 1024px) 100vw, 58vw"
-                priority
-                className="object-cover object-[50%_38%]"
-              />
-              {/* Top-left coordinate overlay badge */}
-              <div className="absolute top-3 left-3 bg-[#0B132B] text-[#F8F9FA] px-3 py-1.5 text-xs font-display tracking-tight tabular-nums z-10">
-                46.78° N, 25.78° E, Lacu Roșu, Romania
-              </div>
-            </div>
-
-            {/* Caption bar directly below the image */}
-            <div className="bg-white border-x border-b border-[rgba(11,19,43,0.12)] px-4 py-3 text-xs text-[rgba(11,19,43,0.75)] flex flex-wrap justify-between gap-2">
-              <span className="tabular-nums">
-                October 11–22, 2026 (incl. travel days), Lacu Roșu, Harghita
-              </span>
-              <span>
-                Co-funded by the European Union, hosted by Asociația Agoje with Orion
-              </span>
-            </div>
+      <div className="container-orion space-y-10 md:space-y-12">
+        {/* Tier 1: Full-Width Panoramic Lead Photo */}
+        <div className="group aspect-[16/10] md:aspect-[16/9] relative overflow-hidden border border-[rgba(11,19,43,0.12)] bg-[#0B132B]">
+          <Image
+            src="/images/projects/reforest-2.jpg"
+            alt="All 40 international youth participants and 8 team leaders of ReForest holding official European Union and project banners on an alpine meadow in Lacu Roșu, Romania"
+            fill
+            sizes="(max-width: 1280px) 100vw, 1280px"
+            priority
+            className="object-cover object-[50%_48%] transition-transform duration-700 ease-out group-hover:scale-[1.02] motion-reduce:transform-none"
+          />
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#0B132B]/55 via-[#0B132B]/15 to-transparent"
+            aria-hidden="true"
+          />
+          <div className="absolute top-3 left-3 bg-[#0B132B] text-[#F8F9FA] px-3 py-1.5 text-xs font-display tracking-tight tabular-nums z-10">
+            46.78° N, 25.78° E, Lacu Roșu, Romania
           </div>
+        </div>
 
-          {/* Right 5 Columns: Memories, Proof & Story */}
-          <div className="lg:col-span-5 space-y-6">
+        {/* Tier 2: Open Oversized Display Metrics Ribbon */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6 pb-10 border-b border-[rgba(11,19,43,0.12)]">
+          {impactMetrics.map((metric) => (
+            <div key={metric.label} className="min-w-0">
+              <div className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#0B132B] tabular-nums whitespace-nowrap">
+                {metric.value}
+              </div>
+              <div className="text-xs font-medium text-[#0B132B]/65 mt-1.5">
+                {metric.label}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Tier 3: Asymmetric 12-Col Story & Sapling Fieldwork Photo */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+          {/* Left 6 Columns: Memories, Proof & Story */}
+          <div className="lg:col-span-6 space-y-6 min-w-0">
             <div className="space-y-2">
-              <div className="font-display text-[12px] font-semibold tracking-[0.01em] text-[#0B132B]/60">
-                Completed youth exchange
+              <div className="font-display text-[12px] font-semibold tracking-[0.01em] text-[#0B132B]/60 tabular-nums">
+                Completed youth exchange, October 2026
               </div>
-              <h2 className="type-h2 text-[#0B132B]">
-                Not a program, but memories, growth, and human connection.
+              <h2 className="type-h1 text-[#0B132B]">
+                ReForest in the Carpathians
               </h2>
-              <div className="text-base font-semibold text-[#0B132B]">
-                ReForest — Erasmus+ Youth Exchange
-              </div>
             </div>
 
             {/* Participant Quote */}
-            <figure className="border-l-2 border-[#e35619] pl-4 py-1 space-y-1.5">
+            <figure className="border-l-2 border-[#e35619] pl-5 py-1 space-y-2">
               <blockquote className="type-body-lg text-[#0B132B]">
                 &ldquo;{quote.quote}&rdquo;
               </blockquote>
@@ -83,23 +87,6 @@ export function ReForestStory() {
                 {quote.name}, {quote.country}
               </figcaption>
             </figure>
-
-            {/* 2x2 Architectural Impact Grid */}
-            <div className="grid grid-cols-2 border-t border-l border-[rgba(11,19,43,0.12)] bg-white">
-              {impactMetrics.map((metric) => (
-                <div
-                  key={metric.label}
-                  className="p-4 border-r border-b border-[rgba(11,19,43,0.12)] space-y-1"
-                >
-                  <div className="font-display text-2xl font-bold text-[#0B132B] tabular-nums">
-                    {metric.value}
-                  </div>
-                  <div className="text-xs text-[#0B132B]/65">
-                    {metric.label}
-                  </div>
-                </div>
-              ))}
-            </div>
 
             {/* Actions */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -116,8 +103,21 @@ export function ReForestStory() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center text-xs font-semibold text-[#0B132B] underline hover:text-[#111D3B] transition-colors"
               >
-                Official ReForest project page ↗
+                Official project page ↗
               </a>
+            </div>
+          </div>
+
+          {/* Right 6 Columns: Sapling Fieldwork Photo */}
+          <div className="lg:col-span-6 min-w-0">
+            <div className="group aspect-[3/2] relative overflow-hidden border border-[rgba(11,19,43,0.12)] bg-[#0B132B]">
+              <Image
+                src="/images/projects/reforest-3.jpg"
+                alt="Youth participants planting native fir and spruce saplings on a Harghita mountain slope during ReForest"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02] motion-reduce:transform-none"
+              />
             </div>
           </div>
         </div>

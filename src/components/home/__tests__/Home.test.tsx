@@ -53,10 +53,10 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
       expect(headline.querySelector('.italic')).toBeNull();
       expect(headline.querySelector('.font-serif')).toBeNull();
 
-      // Verbatim Lead copy
+      // Verbatim Lead copy (1 concise sentence)
       expect(
         screen.getByText(
-          /Orion helps young people find direction, cross borders, and grow, together\./i
+          'Orion helps young people find direction, cross borders, and grow, together.'
         )
       ).toBeInTheDocument();
 
@@ -74,7 +74,7 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
   });
 
   describe('ReForestStory', () => {
-    it('renders daylight spread on #F8F9FA, telemetry badge, 4 canonical metrics (40 + 8, 4, 12 days, 1,000+), Kemal quote, no accordion button, and project links', () => {
+    it('renders daylight spread on #F8F9FA, telemetry badge, both photos (reforest-2.jpg and reforest-3.jpg), 4 canonical metrics (40 + 8, 4, 12 days, 1,000+), Kemal quote, no accordion button, and project links', () => {
       const { container } = render(<ReForestStory />);
 
       const section = container.querySelector('section');
@@ -83,19 +83,20 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
       expect(
         screen.getByText(/46\.78° N, 25\.78° E, Lacu Roșu, Romania/i)
       ).toBeInTheDocument();
-      expect(
-        screen.getByText(/October 11–22, 2026 \(incl\. travel days\), Lacu Roșu, Harghita/i)
-      ).toBeInTheDocument();
+
+      // Both documentary images
+      const images = screen.getAllByRole('img');
+      expect(images.length).toBeGreaterThanOrEqual(2);
+      const imgSrcs = images.map((img) => img.getAttribute('src') ?? '');
+      expect(imgSrcs.some((src) => src.includes('reforest-2.jpg'))).toBe(true);
+      expect(imgSrcs.some((src) => src.includes('reforest-3.jpg'))).toBe(true);
 
       // Title & verified single testimonial attributed to Kemal
       expect(
         screen.getByRole('heading', {
           level: 2,
-          name: /Not a program, but memories, growth, and human connection\./i,
+          name: /ReForest in the Carpathians/i,
         })
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(/ReForest — Erasmus\+ Youth Exchange/i)
       ).toBeInTheDocument();
       expect(screen.getByText(/Kemal/i)).toBeInTheDocument();
       expect(
@@ -124,7 +125,7 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
       expect(storyLink).toHaveAttribute('href', '/projects/reforest');
 
       const agojeLink = screen.getByRole('link', {
-        name: /Official ReForest project page/i,
+        name: /Official project page/i,
       });
       expect(agojeLink).toHaveAttribute(
         'href',
@@ -134,13 +135,13 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
   });
 
   describe('NextDeparture', () => {
-    it('renders 4-column specs bar, consortium/outcome dossier, open 4-column 24-hour exchange rhythm, and grant reference on #F8F9FA', () => {
+    it('renders 2x2 specs grid, partner metadata bar, DailyExchangeAnatomy rhythm, and grant reference on #F8F9FA', () => {
       const { container } = render(<NextDeparture />);
 
       const section = container.querySelector('section');
       expect(section?.className).toContain('bg-[#F8F9FA]');
 
-      expect(screen.getByText(/Next departure/i)).toBeInTheDocument();
+      expect(screen.getByText(/Next departure, March 2027/i)).toBeInTheDocument();
       expect(
         screen.getByRole('heading', {
           level: 2,
@@ -148,17 +149,21 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
         })
       ).toBeInTheDocument();
 
-      // 4-column specs bar
+      // 2x2 specs grid
       expect(screen.getByText('When')).toBeInTheDocument();
-      expect(screen.getAllByText(/March 2027/i).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/March 2027 \(9 days\)/i).length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('Where')).toBeInTheDocument();
       expect(screen.getAllByText(/Eastern Hungary/i).length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('Who')).toBeInTheDocument();
-      expect(screen.getByText(/18–26/i)).toBeInTheDocument();
+      expect(screen.getByText(/Ages 18–26 \(32 \+ 8\)/i)).toBeInTheDocument();
       expect(screen.getByText('Cost')).toBeInTheDocument();
       expect(screen.getByText(/100% Erasmus\+ funded/i)).toBeInTheDocument();
 
-      // Open 4-column 24-hour exchange rhythm
+      // Compact bottom metadata bar
+      expect(screen.getByText('Hungary, Romania, Spain, Czechia')).toBeInTheDocument();
+      expect(screen.getByText('Youthpass certified')).toBeInTheDocument();
+
+      // DailyExchangeAnatomy integration
       expect(
         screen.getByRole('heading', {
           level: 3,
@@ -184,10 +189,9 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
         '/open-calls/the-financial-blueprint'
       );
 
-      // Static consortium & outcome dossier
-      expect(screen.getByText(/International Consortium/i)).toBeInTheDocument();
-      expect(screen.getByText(/What You Will Master/i)).toBeInTheDocument();
-      expect(screen.getByText(/Official Recognition/i)).toBeInTheDocument();
+      // Old prose boxes removed
+      expect(screen.queryByText(/What You Will Master/i)).toBeNull();
+      expect(screen.queryByText(/Official Recognition/i)).toBeNull();
       expect(
         screen.queryByRole('link', { name: /Read the infopack/i })
       ).toBeNull();
@@ -195,7 +199,7 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
   });
 
   describe('HowToApply', () => {
-    it('renders static 3-step trajectory on #F8F9FA with permanent Step 2 motivation quote and zero tab buttons', () => {
+    it('renders compact 3-step trajectory on #F8F9FA without sample motivation blockquote and zero buttons', () => {
       const { container } = render(<HowToApply />);
 
       const section = container.querySelector('section');
@@ -221,15 +225,23 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
         })
       ).toBeInTheDocument();
 
+      expect(
+        screen.getByText('Contact details, residency, and language comfort.')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Three honest sentences on why you want to join.')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Selection confirmation, travel plan, and group prep.')
+      ).toBeInTheDocument();
+
       // Zero interactive step buttons
       expect(screen.queryAllByRole('button')).toHaveLength(0);
 
-      // Permanent display of sample 3-sentence motivation inside Step 2
+      // Sample motivation strip removed
       expect(
-        screen.getByText(
-          /I am starting my first job next autumn and want to replace my anxiety around budgeting with a concrete savings system/i
-        )
-      ).toBeInTheDocument();
+        screen.queryByText(/I am starting my first job next autumn/i)
+      ).toBeNull();
 
       const openCallsLink = screen.getByRole('link', {
         name: /See all open calls/i,
@@ -239,11 +251,11 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
   });
 
   describe('Beliefs', () => {
-    it('renders "What we believe" on #F8F9FA with bg-white cells, all 4 locked pillar H3s, and no Roman numerals', () => {
+    it('renders "What we believe" on #0B132B with 4 locked pillar H3s, no Roman numerals, and zero body paragraphs', () => {
       const { container } = render(<Beliefs />);
 
       const section = container.querySelector('section');
-      expect(section?.className).toContain('bg-[#F8F9FA]');
+      expect(section?.className).toContain('bg-[#0B132B]');
 
       expect(
         screen.getByRole('heading', { level: 2, name: /What we believe/i })
@@ -254,6 +266,9 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
       expect(screen.queryByText('II')).toBeNull();
       expect(screen.queryByText('III')).toBeNull();
       expect(screen.queryByText('IV')).toBeNull();
+
+      // Zero <p> body paragraphs
+      expect(container.querySelectorAll('p')).toHaveLength(0);
 
       // All 4 locked pillar headings
       expect(
@@ -283,11 +298,31 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
           name: /Real impact, backed by proof\./i,
         })
       ).toBeInTheDocument();
+
+      // Default telemetry readout
+      expect(screen.getByText('01 / 04')).toBeInTheDocument();
+      expect(screen.getByText('Shared trajectory')).toBeInTheDocument();
+
+      // Clicking a belief button updates telemetry readout
+      const constellationBtn = screen.getByRole('button', {
+        name: /A constellation of young changemakers\./i,
+      });
+      fireEvent.click(constellationBtn);
+      expect(screen.getByText('03 / 04')).toBeInTheDocument();
+      expect(screen.getByText('Orion cluster')).toBeInTheDocument();
+
+      // WCAG 2.2.2 Pause/Play motion control without aria-pressed
+      const motionBtn = screen.getByRole('button', { name: /Pause motion/i });
+      expect(motionBtn).not.toHaveAttribute('aria-pressed');
+      fireEvent.click(motionBtn);
+      expect(
+        screen.getByRole('button', { name: /Play motion/i })
+      ).not.toHaveAttribute('aria-pressed');
     });
   });
 
   describe('PartnerBand', () => {
-    it('renders outer #F8F9FA section wrapping framed #0B132B container with verbatim long-form boilerplate and copy buttons', async () => {
+    it('renders outer #F8F9FA section wrapping framed #0B132B container with 1-sentence intro and copy buttons', async () => {
       const { container } = render(<PartnerBand />);
 
       const section = container.querySelector('section');
@@ -301,16 +336,13 @@ describe('Home Page Components — Exceptional Editorial Architecture', () => {
         })
       ).toBeInTheDocument();
 
-      // Verbatim long-form boilerplate
+      // Single concise sentence intro
       expect(
         screen.getByText(
-          'Orion is an international youth initiative that turns participation into memories, growth, and human connection. Guided by the idea of a constellation of young changemakers who help each other navigate and move upward, we create programs that deliver measurable personal and cross-cultural impact.'
+          'Orion Fiatalok Informális Csoportja partners with European youth NGOs on Erasmus+ KA1 and KA2 mobilities.'
         )
       ).toBeInTheDocument();
 
-      expect(
-        screen.getByText(/Orion Fiatalok Informális Csoportja/i)
-      ).toBeInTheDocument();
       expect(screen.getByText('zeid@orionyouth.eu')).toBeInTheDocument();
       expect(
         screen.getByText(/2026-1-HU01-KA152-YOU-000399636/i)

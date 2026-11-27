@@ -49,13 +49,51 @@ export function HeroSection() {
         ))}
       </div>
 
+      {/* Atmospheric Celestial Coordinate Graticule */}
+      <svg
+        className="pointer-events-none absolute inset-0 z-0 opacity-60 w-full h-full"
+        viewBox="0 0 1440 800"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <defs>
+          <radialGradient id="hero-graticule-fade" cx="62%" cy="48%" r="58%">
+            <stop offset="0%" stopColor="white" stopOpacity="1" />
+            <stop offset="55%" stopColor="white" stopOpacity="0.65" />
+            <stop offset="100%" stopColor="black" stopOpacity="0" />
+          </radialGradient>
+          <mask id="hero-graticule-mask">
+            <rect width="1440" height="800" fill="url(#hero-graticule-fade)" />
+          </mask>
+        </defs>
+        <g mask="url(#hero-graticule-mask)" fill="none" stroke="rgba(248,249,250,0.05)" strokeWidth="1">
+          {/* Concentric celestial arcs */}
+          <circle cx="920" cy="380" r="180" />
+          <circle cx="920" cy="380" r="300" strokeDasharray="3 5" />
+          <circle cx="920" cy="380" r="440" />
+          <circle cx="920" cy="380" r="600" />
+          <circle cx="920" cy="380" r="780" strokeDasharray="4 8" />
+
+          {/* Horizon lines */}
+          <line x1="0" y1="200" x2="1440" y2="200" />
+          <line x1="0" y1="380" x2="1440" y2="380" />
+          <line x1="0" y1="560" x2="1440" y2="560" />
+
+          {/* Meridian lines */}
+          <line x1="360" y1="0" x2="360" y2="800" />
+          <line x1="640" y1="0" x2="640" y2="800" />
+          <line x1="920" y1="0" x2="920" y2="800" />
+          <line x1="1200" y1="0" x2="1200" y2="800" />
+        </g>
+      </svg>
+
       {/* Atmospheric Cosmic Ambient Glow behind right planetary system */}
       <div
         className="pointer-events-none absolute -right-[5%] top-[10%] w-[640px] h-[460px] rounded-full bg-[radial-gradient(circle,rgba(29,53,107,0.55)_0%,rgba(227,86,25,0.08)_40%,transparent_72%)] blur-2xl z-0"
         aria-hidden="true"
       />
 
-      <div className="container-orion py-10 md:py-16 relative z-20">
+      <div className="container-orion py-12 md:py-20 relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           {/* Left 5 Columns: Pure Editorial Poise & Breathing Room */}
           <div className="lg:col-span-5 space-y-6">
@@ -69,7 +107,7 @@ export function HeroSection() {
             </h1>
 
             <p className="type-body-lg text-[rgba(248,249,250,0.85)] leading-relaxed max-w-[65ch]">
-              Orion helps young people find direction, cross borders, and grow, together. We are a constellation of young changemakers turning European mobility into memories, growth, and human connection.
+              Orion helps young people find direction, cross borders, and grow, together.
             </p>
 
             {/* Dual CTAs: Off-White Primary (respecting single-orange budget) + Outline Secondary */}

@@ -4,10 +4,10 @@ import { render, screen } from '@testing-library/react';
 import { ErasmusHorizonSlider } from '../ErasmusHorizonSlider';
 
 describe('ErasmusHorizonSlider Component — Zero-Widget 12-Column Architectural Comparison', () => {
-  it('renders section header with eyebrow, H2 display headline, and explanatory lead', () => {
+  it('renders tightened section header with H2 display headline, 1-line lead, and no eyebrow', () => {
     render(<ErasmusHorizonSlider />);
 
-    expect(screen.getByText('Demystifying Erasmus+')).toBeInTheDocument();
+    expect(screen.queryByText('Demystifying Erasmus+')).not.toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
         level: 2,
@@ -15,11 +15,13 @@ describe('ErasmusHorizonSlider Component — Zero-Widget 12-Column Architectural
       })
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Hear the word “Erasmus” and picture a 6-month university term with high rent\? That is KA131\./i)
+      screen.getByText(
+        /Not a six-month university term—an Orion Youth Exchange takes a week and costs nothing\./i
+      )
     ).toBeInTheDocument();
   });
 
-  it('renders the left 5-column University Semester (KA131) misconception ledger', () => {
+  it('renders the left 5-column University Semester (KA131) 4-row comparison ledger', () => {
     render(<ErasmusHorizonSlider />);
 
     expect(screen.getByText('University semester (KA131)')).toBeInTheDocument();
@@ -27,24 +29,13 @@ describe('ErasmusHorizonSlider Component — Zero-Widget 12-Column Architectural
       screen.getByRole('heading', { level: 3, name: /Academic relocation/i })
     ).toBeInTheDocument();
 
-    // 5 comparison rows
-    expect(screen.getByText(/5 to 10 months:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Full semester away from home and work\./i)).toBeInTheDocument();
-
-    expect(screen.getByText(/University students only:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Requires active degree enrollment and GPA transcripts\./i)).toBeInTheDocument();
-
-    expect(screen.getByText(/Partial monthly stipend:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Requires €3,000\+ in personal savings for private rent\./i)).toBeInTheDocument();
-
-    expect(screen.getByText(/Formal university lectures:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Academic coursework, essays, and final exams\./i)).toBeInTheDocument();
-
-    expect(screen.getByText(/Solo navigation:/i)).toBeInTheDocument();
-    expect(screen.getByText(/You relocate and handle foreign housing contracts alone\./i)).toBeInTheDocument();
+    expect(screen.getByText('5–10 months')).toBeInTheDocument();
+    expect(screen.getByText('Enrolled uni students')).toBeInTheDocument();
+    expect(screen.getByText('Partial stipend, own rent')).toBeInTheDocument();
+    expect(screen.getByText('Lectures, essays & exams')).toBeInTheDocument();
   });
 
-  it('renders the right 7-column Orion Youth Exchange (KA152) reality panel with verified funding badge', () => {
+  it('renders the right 7-column Orion Youth Exchange (KA152) 4-row reality panel with verified funding badge', () => {
     render(<ErasmusHorizonSlider />);
 
     expect(screen.getByText('Orion Youth Exchange (KA152)')).toBeInTheDocument();
@@ -53,21 +44,15 @@ describe('ErasmusHorizonSlider Component — Zero-Widget 12-Column Architectural
       screen.getByRole('heading', { level: 3, name: /Short, immersive cross-border adventure/i })
     ).toBeInTheDocument();
 
-    // 5 comparison rows
-    expect(screen.getByText(/7 to 12 days:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Fits cleanly between school terms, jobs, or annual leave\./i)).toBeInTheDocument();
+    expect(screen.getAllByText('Duration')).toHaveLength(2);
+    expect(screen.getAllByText('Eligibility')).toHaveLength(2);
+    expect(screen.getAllByText('Cost')).toHaveLength(2);
+    expect(screen.getAllByText('Format')).toHaveLength(2);
 
-    expect(screen.getByText(/Open to anyone aged 18–30:/i)).toBeInTheDocument();
-    expect(screen.getByText(/No university enrollment, diploma, or prior experience needed\./i)).toBeInTheDocument();
-
-    expect(screen.getByText(/€0 out-of-pocket lodging & food:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Accommodation, 3 meals a day, and workshops are 100% covered/i)).toBeInTheDocument();
-
-    expect(screen.getByText(/Non-formal learning:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Outdoor challenges, simulations, and creative teamwork/i)).toBeInTheDocument();
-
-    expect(screen.getByText(/Never travel alone:/i)).toBeInTheDocument();
-    expect(screen.getByText(/You travel as a Hungarian delegation with an experienced Orion group leader/i)).toBeInTheDocument();
+    expect(screen.getByText('7–12 days')).toBeInTheDocument();
+    expect(screen.getByText('Anyone aged 18–30')).toBeInTheDocument();
+    expect(screen.getByText('€0 lodging, food & workshops')).toBeInTheDocument();
+    expect(screen.getByText('Hands-on labs, group leader')).toBeInTheDocument();
   });
 
   it('renders primary call to action buttons inside the dark panel', () => {

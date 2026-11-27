@@ -66,7 +66,7 @@ export function NodeInspector({
 }: NodeInspectorProps) {
   if (!node) {
     return (
-      <aside aria-live="polite" className={`pt-3 text-[#F8F9FA] ${className}`.trim()}>
+      <aside aria-live="polite" className={`pt-2.5 text-[#F8F9FA] ${className}`.trim()}>
         <h3 className="type-h3 text-[#F8F9FA]">Select a mission</h3>
         <p className="type-body text-sm text-[rgba(248,249,250,0.72)] mt-1 max-w-[65ch]">
           Explore Orion&apos;s Debrecen core, completed Transylvanian mobilities, and upcoming hosted projects.
@@ -81,10 +81,10 @@ export function NodeInspector({
   return (
     <aside
       aria-live="polite"
-      className={`pt-3 text-[#F8F9FA] space-y-4 ${className}`.trim()}
+      className={`pt-2.5 text-[#F8F9FA] space-y-3.5 ${className}`.trim()}
     >
       {/* 3-cell structured geodesic telemetry bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 pb-3 border-b border-[#1D356B]/60">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 pb-3 border-b border-[rgba(248,249,250,0.12)]">
         <div>
           <span className="block text-[11px] font-medium text-[rgba(248,249,250,0.55)] font-display">
             Vector from HQ

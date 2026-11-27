@@ -9,30 +9,24 @@ interface StepInfo {
   description: string;
 }
 
-const SAMPLE_MOTIVATION =
-  'I am starting my first job next autumn and want to replace my anxiety around budgeting with a concrete savings system. In Hungary, I hope to share how young people in my city navigate rent and inflation while learning practical cashflow tools from peers. Afterward, I will host a local peer-budgeting workshop at my university youth club.';
-
 const STEPS: StepInfo[] = [
   {
     num: '1',
     title: 'About you',
     time: '~2 mins',
-    description:
-      'Share your basic contact details, language comfort, and home country residency in two minutes.',
+    description: 'Contact details, residency, and language comfort.',
   },
   {
     num: '2',
     title: 'Your motivation',
     time: '~5 mins',
-    description:
-      'Tell us in three honest sentences what this theme means to your growth and what you hope to contribute.',
+    description: 'Three honest sentences on why you want to join.',
   },
   {
     num: '3',
     title: 'Travel and confirmation',
     time: '~3 mins',
-    description:
-      'Receive selection confirmation, practical travel guidance, and prep sessions with your national leader.',
+    description: 'Selection confirmation, travel plan, and group prep.',
   },
 ];
 
@@ -40,8 +34,7 @@ const STEPS: StepInfo[] = [
  * HowToApply Component — Daylight Off-White (#F8F9FA)
  *
  * Static 3-step application trajectory joined by a clean TrajectoryArc flight path.
- * Zero tab clicking: all 3 steps are balanced in equal-height cards on #FFFFFF,
- * with the sample 3-sentence motivation rendered cleanly underneath as a full-width strip.
+ * Zero tab clicking: all 3 steps are presented in borderless editorial columns.
  */
 export function HowToApply() {
   const ARC_CURVATURE = -0.045;
@@ -52,7 +45,7 @@ export function HowToApply() {
   const arcPoints = [startPt, { x: 400, y: midY }, endPt];
 
   return (
-    <section className="w-full bg-[#F8F9FA] text-[#0B132B] py-20 md:py-28 border-b border-[rgba(11,19,43,0.10)]">
+    <section className="w-full bg-[#F8F9FA] text-[#0B132B] py-20 md:py-24 border-b border-[rgba(11,19,43,0.10)]">
       <div className="container-orion space-y-12">
         {/* Header Row */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
@@ -109,49 +102,31 @@ export function HowToApply() {
             </svg>
           </div>
 
-          {/* 3 Static Step Cards on #FFFFFF */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch">
+          {/* 3 Borderless Editorial Columns */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 pt-2">
             {STEPS.map((step) => (
               <div
                 key={step.num}
-                className="bg-white border border-[rgba(11,19,43,0.12)] p-6 space-y-4 text-left h-full flex flex-col justify-start"
+                className="border-t border-[rgba(11,19,43,0.14)] pt-6 space-y-3 text-left min-w-0"
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-7 h-7 shrink-0 rounded-full bg-[#0B132B] text-[#F8F9FA] border border-[#0B132B] flex items-center justify-center font-display font-semibold text-xs tabular-nums">
-                      {step.num}
-                    </div>
-                    <h3 className="type-h3 text-base lg:text-lg text-[#0B132B] leading-snug">
-                      {step.title}
-                    </h3>
-                  </div>
-
-                  <span className="text-xs text-[rgba(11,19,43,0.68)] tabular-nums shrink-0 whitespace-nowrap">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="font-display text-4xl md:text-5xl font-bold tracking-tight text-[#0B132B]/20 tabular-nums leading-none">
+                    0{step.num}
+                  </span>
+                  <span className="text-xs font-semibold text-[rgba(11,19,43,0.65)] tabular-nums whitespace-nowrap">
                     {step.time}
                   </span>
                 </div>
+
+                <h3 className="type-h3 text-lg md:text-xl text-[#0B132B] leading-snug">
+                  {step.title}
+                </h3>
 
                 <p className="type-body text-sm text-[rgba(11,19,43,0.76)] leading-relaxed">
                   {step.description}
                 </p>
               </div>
             ))}
-          </div>
-
-          {/* Full-width Sample 3-sentence motivation strip */}
-          <div className="bg-white border border-[rgba(11,19,43,0.12)] p-6 space-y-2">
-            <div className="flex items-center gap-2">
-              <span
-                className="w-1.5 h-1.5 rounded-full bg-[#E35619]"
-                aria-hidden="true"
-              />
-              <span className="text-xs font-semibold text-[#0B132B]">
-                Sample 3-sentence motivation
-              </span>
-            </div>
-            <blockquote className="text-sm text-[rgba(11,19,43,0.82)] italic leading-relaxed">
-              &ldquo;{SAMPLE_MOTIVATION}&rdquo;
-            </blockquote>
           </div>
         </div>
       </div>

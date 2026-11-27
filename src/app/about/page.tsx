@@ -7,6 +7,7 @@ import { MotionTrailDivider } from '@/components/motifs/MotionTrailDivider';
 import { SparkleStar } from '@/components/motifs/SparkleStar';
 import { Button } from '@/components/ui/Button';
 import { ConstellationLeadershipGrid } from '@/components/about/ConstellationLeadershipGrid';
+import { OperationalPillarsObservatory } from '@/components/about/OperationalPillarsObservatory';
 
 export const metadata: Metadata = {
   title: 'About Orion — Origin, Capacity & Leadership',
@@ -69,7 +70,7 @@ export default function AboutPage() {
         title="The constellation rooted in Debrecen"
         lead="Founded by a dynamic fusion of local Hungarian and international university students, Orion Fiatalok Informális Csoportja empowers young people to reach their full potential through non-formal education and cross-border mobility."
         aside={
-          <aside className="bg-[#111D3B] border border-[#1D356B] p-6 space-y-3 text-xs text-[rgba(248,249,250,0.85)] tabular-nums">
+          <aside className="bg-[#111D3B]/65 backdrop-blur-md border border-[rgba(248,249,250,0.14)] border-t-[rgba(248,249,250,0.22)] p-6 space-y-3 text-xs text-[rgba(248,249,250,0.85)] tabular-nums">
             <div className="flex items-center gap-2 text-[#F8F9FA] font-semibold">
               <span className="w-2 h-2 rounded-full bg-[#E35619]" aria-hidden="true" />
               <span>Debrecen Anchor Station</span>
@@ -112,13 +113,10 @@ export default function AboutPage() {
 
               <div className="space-y-4 type-body text-[rgba(11,19,43,0.84)] leading-relaxed">
                 <p>
-                  <strong>Orion Fiatalok Informális Csoportja</strong> (<em>Orion Informal Group of Young People</em>) was founded in Debrecen, Hungary by a dynamic fusion of local Hungarian and international university students. Guided by the mission to create the brightest stars, our initiative empowers young people to reach their full potential through non-formal experiential education, intercultural dialogue, and cross-border mobility.
+                  <strong>Orion Fiatalok Informális Csoportja</strong> (<em>Orion Informal Group of Young People</em>) was founded in Debrecen by local Hungarian and international university students. Guided by our mission to &ldquo;create the brightest stars,&rdquo; we empower young people through non-formal experiential education, intercultural dialogue, and cross-border mobility.
                 </p>
                 <p>
-                  Although recently established, Orion operates on the collective voluntary and professional portfolios of its founding members across major international student networks (<strong>ESN</strong>, <strong>AIESEC</strong>), the National Union of Students in Hungary (<strong>HÖOK</strong>), university foreign affairs offices, and private-sector project execution. We combine professional teaching experience with firsthand insight from participating in Erasmus+ youth exchanges, giving us an intimate understanding of the participant journey from both sides of the table.
-                </p>
-                <p>
-                  By leveraging our diverse cultural and academic backgrounds, Orion serves as an accessible peer-to-peer platform for personal growth, active citizenship, and global networking. We actively bridge the linguistic and cultural gaps between European programs and local youth reality, ensuring that life-changing international opportunities reach those who might otherwise miss out.
+                  Our leadership unites active classroom teaching and firsthand Erasmus+ alumni insight with voluntary portfolios across <strong>ESN</strong>, <strong>AIESEC</strong>, and the National Union of Students in Hungary (<strong>HÖOK</strong>). By bridging linguistic and cultural gaps, we open international learning opportunities to local youth who might otherwise miss out.
                 </p>
               </div>
             </div>
@@ -126,13 +124,13 @@ export default function AboutPage() {
             {/* Right 6 Columns */}
             <div className="lg:col-span-6 space-y-0 min-w-0">
               {/* Documentary Photo Frame */}
-              <div className="aspect-[16/10] relative overflow-hidden border border-[rgba(11,19,43,0.12)] bg-[#0B132B]">
+              <div className="group aspect-[16/10] relative overflow-hidden border border-[rgba(11,19,43,0.12)] bg-[#0B132B]">
                 <Image
                   src="/images/projects/reforest-2.jpg"
                   alt="Orion Fiatalok Informális Csoportja delegation and European partners at ReForest in Lacu Roșu"
                   fill
                   sizes="(max-width: 1024px) 100vw, 48vw"
-                  className="object-cover object-[50%_38%]"
+                  className="object-cover object-[50%_48%] transition-transform duration-700 ease-out group-hover:scale-[1.02] motion-reduce:transform-none"
                   priority
                 />
                 {/* Top-left cohort badge */}
@@ -141,17 +139,12 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              {/* Attached Caption Strip */}
-              <div className="bg-white border-x border-b border-[rgba(11,19,43,0.12)] px-4 py-3 text-xs text-[rgba(11,19,43,0.72)]">
-                Orion Fiatalok Informális Csoportja delegation alongside European partner teams at ReForest in Lacu Roșu, Romania.
-              </div>
-
-              {/* Attached Institutional Profile Spec Matrix */}
-              <div className="bg-white border-x border-b border-[rgba(11,19,43,0.12)] p-6 space-y-4">
+              {/* Clean Borderless Hairline Institutional Profile */}
+              <div className="pt-6 space-y-4">
                 <h3 className="font-display font-semibold text-base text-[#0B132B]">
                   Institutional profile
                 </h3>
-                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm pt-2 border-t border-[rgba(11,19,43,0.08)]">
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm pt-4 border-t border-[rgba(11,19,43,0.12)]">
                   <div>
                     <dt className="text-xs text-[rgba(11,19,43,0.65)]">Legal name (Hungarian)</dt>
                     <dd className="font-medium text-[#0B132B] mt-0.5">{ORION_ORG.legalName}</dd>
@@ -178,7 +171,7 @@ export default function AboutPage() {
                     <dt className="text-xs text-[rgba(11,19,43,0.65)]">Network foundations</dt>
                     <dd className="font-medium text-[#0B132B] mt-0.5">ESN, AIESEC, HÖOK</dd>
                   </div>
-                  <div className="sm:col-span-2 pt-2 border-t border-[rgba(11,19,43,0.08)]">
+                  <div className="sm:col-span-2 pt-3 border-t border-[rgba(11,19,43,0.10)]">
                     <dt className="text-xs text-[rgba(11,19,43,0.65)]">Coordination email</dt>
                     <dd className="mt-0.5">
                       <a
@@ -196,8 +189,8 @@ export default function AboutPage() {
 
           {/* Part B: Juxtaposed Dual Mandate Split (Daylight vs. Night Contrast, 12-col grid) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-            {/* Left 6 cols: Hosting in Hungary (Daylight Card) */}
-            <div className="lg:col-span-6 bg-white border border-[rgba(11,19,43,0.12)] p-8 md:p-10 flex flex-col justify-between gap-6">
+            {/* Left 6 cols: Hosting in Hungary (Borderless Daylight Column) */}
+            <div className="lg:col-span-6 border-t border-[rgba(11,19,43,0.14)] pt-8 flex flex-col justify-between gap-6">
               <div className="space-y-4">
                 <div className="type-eyebrow text-[#0B132B]/65">Domestic &amp; incoming projects</div>
                 <h3 className="type-h3 text-2xl text-[#0B132B]">Hosting in Hungary</h3>
@@ -210,8 +203,8 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* Right 6 cols: Sending across Europe (Night Card) */}
-            <div className="lg:col-span-6 bg-[#0B132B] text-[#F8F9FA] border border-[#0B132B] p-8 md:p-10 flex flex-col justify-between gap-6">
+            {/* Right 6 cols: Sending across Europe (Elevated Night Panel) */}
+            <div className="lg:col-span-6 bg-[#0B132B] text-[#F8F9FA] border-t-2 border-t-[#E35619] border-x border-b border-[#0B132B] p-8 md:p-10 flex flex-col justify-between gap-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between gap-2">
                   <div className="type-eyebrow text-[#F8F9FA]/70">Cross-border outgoing mandate</div>
@@ -256,91 +249,8 @@ export default function AboutPage() {
             &ldquo;{ORION_ORG.longBoilerplate}&rdquo;
           </blockquote>
 
-          {/* Section Header */}
-          <div className="space-y-2 max-w-3xl">
-            <div className="type-eyebrow text-[rgba(248,249,250,0.7)]">Operational foundations</div>
-            <h2 className="type-h2 text-[#F8F9FA]">
-              Four pillars of operational capacity
-            </h2>
-            <p className="type-body text-[rgba(248,249,250,0.80)]">
-              Though newly established as an informal group, Orion delivers hosting and sending partnerships backed by four core team competencies.
-            </p>
-          </div>
-
-          {/* 2x2 Asymmetric Observatory Instrument Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-12 border-t border-l border-[#1D356B]">
-            {/* Pillar 1: 7 cols */}
-            <div className="md:col-span-7 bg-[#111D3B] border-r border-b border-[#1D356B] p-8 md:p-10 flex flex-col justify-between gap-6 min-w-0">
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <SparkleStar size={14} color="#e35619" />
-                </div>
-                <h3 className="type-h3 text-xl md:text-2xl text-[#F8F9FA] leading-snug">
-                  Cross-cultural pedagogy and educational integration
-                </h3>
-                <p className="type-body text-[rgba(248,249,250,0.82)] leading-relaxed">
-                  Our leadership team includes international residents actively employed as English teachers for Hungarian children. Navigating the Hungarian school system daily develops advanced non-verbal communication skills and deep understanding of local youth culture. We unite this pedagogical foundation with extensive firsthand experience as Erasmus+ participants, designing learning environments that are structured, engaging, and culturally attuned.
-                </p>
-              </div>
-              <div className="border-t border-[rgba(248,249,250,0.12)] pt-4 text-xs text-[rgba(248,249,250,0.68)]">
-                Active English educators in Hungarian schools &amp; Erasmus+ alumni
-              </div>
-            </div>
-
-            {/* Pillar 2: 5 cols */}
-            <div className="md:col-span-5 bg-[#111D3B] border-r border-b border-[#1D356B] p-8 md:p-10 flex flex-col justify-between gap-6 min-w-0">
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <SparkleStar size={14} color="#e35619" />
-                </div>
-                <h3 className="type-h3 text-xl md:text-2xl text-[#F8F9FA] leading-snug">
-                  Project management and organizational structure
-                </h3>
-                <p className="type-body text-[rgba(248,249,250,0.82)] leading-relaxed">
-                  Combining professional backgrounds in business administration, sports coaching, and NGO leadership, our members bring operational rigor to every mobility. High-level leadership experience from global networks like AIESEC—directing marketing teams, executing crisis-response fundraising, and managing complex logistics—ensures structured workflows, deadline discipline, and dependable risk management.
-                </p>
-              </div>
-              <div className="border-t border-[rgba(248,249,250,0.12)] pt-4 text-xs text-[rgba(248,249,250,0.68)]">
-                Business administration, sports coaching &amp; AIESEC logistics
-              </div>
-            </div>
-
-            {/* Pillar 3: 5 cols */}
-            <div className="md:col-span-5 bg-[#111D3B] border-r border-b border-[#1D356B] p-8 md:p-10 flex flex-col justify-between gap-6 min-w-0">
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <SparkleStar size={14} color="#e35619" />
-                </div>
-                <h3 className="type-h3 text-xl md:text-2xl text-[#F8F9FA] leading-snug">
-                  Advanced communication and information management
-                </h3>
-                <p className="type-body text-[rgba(248,249,250,0.82)] leading-relaxed">
-                  Rather than treating dissemination as an afterthought, Orion maintains dedicated internal capacity for knowledge organization and digital strategy. Led by specialists in Information and Library Science (ELTE) alongside experienced student-union PR managers, we build systematic editorial, graphic, and archiving workflows that ensure project results reach general youth across Hungary.
-                </p>
-              </div>
-              <div className="border-t border-[rgba(248,249,250,0.12)] pt-4 text-xs text-[rgba(248,249,250,0.68)]">
-                ELTE Information &amp; Library Science, Knowledge Management &amp; PR
-              </div>
-            </div>
-
-            {/* Pillar 4: 7 cols */}
-            <div className="md:col-span-7 bg-[#111D3B] border-r border-b border-[#1D356B] p-8 md:p-10 flex flex-col justify-between gap-6 min-w-0">
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <SparkleStar size={14} color="#e35619" />
-                </div>
-                <h3 className="type-h3 text-xl md:text-2xl text-[#F8F9FA] leading-snug">
-                  Social inclusion and participant welfare
-                </h3>
-                <p className="type-body text-[rgba(248,249,250,0.82)] leading-relaxed">
-                  Our inclusion mandate is grounded in years of direct fieldwork: volunteering with grassroots NGOs in Bangladesh, facilitating activities for children with special needs and learning disabilities at Lady of Peace, and mentoring international students through the HÖOK Diaspora Mentoring Program. This trained empathy and arrival-support expertise makes Orion an exceptionally safe partner for participants facing fewer opportunities.
-                </p>
-              </div>
-              <div className="border-t border-[rgba(248,249,250,0.12)] pt-4 text-xs text-[rgba(248,249,250,0.68)]">
-                Bangladesh NGO fieldwork, Lady of Peace &amp; HÖOK Diaspora Mentoring
-              </div>
-            </div>
-          </div>
+          {/* Interactive Operational Pillars Observatory */}
+          <OperationalPillarsObservatory />
         </div>
       </section>
 

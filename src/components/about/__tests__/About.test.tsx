@@ -171,6 +171,22 @@ describe('About Partition Components', () => {
         })
       ).toBeInTheDocument();
 
+      // 3b. OperationalPillarsObservatory interactive readout & WCAG 2.2.2 motion control
+      expect(screen.getByText('01 / 04')).toBeInTheDocument();
+
+      const commsPillarBtn = screen.getByRole('button', {
+        name: /Advanced communication and information management/i,
+      });
+      fireEvent.click(commsPillarBtn);
+      expect(screen.getByText('03 / 04')).toBeInTheDocument();
+
+      const motionBtn = screen.getByRole('button', { name: /Pause motion/i });
+      expect(motionBtn).not.toHaveAttribute('aria-pressed');
+      fireEvent.click(motionBtn);
+      expect(
+        screen.getByRole('button', { name: /Play motion/i })
+      ).not.toHaveAttribute('aria-pressed');
+
       // 4. All 5 team member headings rendered via ConstellationLeadershipGrid
       expect(
         screen.getByRole('heading', { name: 'Zeid Isaac' })

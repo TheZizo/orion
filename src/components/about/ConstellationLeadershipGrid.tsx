@@ -18,12 +18,19 @@ interface StarNode {
 }
 
 const STAR_NODES: StarNode[] = [
-  { id: 'zeid-isaac', label: 'Zeid', index: '01', x: 120, y: 74 },
-  { id: 'roberta-szabo', label: 'Roberta', index: '02', x: 310, y: 42 },
-  { id: 'jazmin-szabo', label: 'Jázmin', index: '03', x: 500, y: 84 },
-  { id: 'jordan-smith', label: 'Jordan', index: '04', x: 690, y: 40 },
-  { id: 'mehmet-ismail', label: 'Mehmet', index: '05', x: 880, y: 76 },
+  { id: 'zeid-isaac', label: 'Zeid', index: '01', x: 120, y: 86 },
+  { id: 'roberta-szabo', label: 'Roberta', index: '02', x: 310, y: 52 },
+  { id: 'jazmin-szabo', label: 'Jázmin', index: '03', x: 500, y: 96 },
+  { id: 'jordan-smith', label: 'Jordan', index: '04', x: 690, y: 50 },
+  { id: 'mehmet-ismail', label: 'Mehmet', index: '05', x: 880, y: 88 },
 ];
+
+const TRAJECTORY_PATH =
+  'M 120 86 C 180 62, 250 46, 310 52 C 375 58, 440 102, 500 96 C 565 90, 630 46, 690 50 C 755 54, 820 94, 880 88';
+
+function starPath(cx: number, cy: number, r: number): string {
+  return `M ${cx} ${cy - r} Q ${cx} ${cy} ${cx + r} ${cy} Q ${cx} ${cy} ${cx} ${cy + r} Q ${cx} ${cy} ${cx - r} ${cy} Q ${cx} ${cy} ${cx} ${cy - r} Z`;
+}
 
 function normalizeDisplayName(member: TeamMember): string {
   if (member.id === 'zeid-isaac' || member.name === 'Zeid George Nicola Isaac') {
@@ -79,45 +86,65 @@ export function ConstellationLeadershipGrid({
       <div className="bg-[#0B132B] border border-[#1D356B] overflow-hidden">
         {/* SVG Star Map Container (aria-hidden for screen readers) */}
         <div
-          className="w-full h-28 sm:h-36 relative overflow-hidden"
+          className="w-full h-32 sm:h-40 relative overflow-hidden"
           aria-hidden="true"
         >
           <svg
-            viewBox="0 0 1000 140"
+            viewBox="0 0 1000 160"
             preserveAspectRatio="xMidYMid meet"
             className="w-full h-full"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* Deterministic faint background stars */}
-            <g fill="rgba(248,249,250,0.30)">
-              <circle cx="50" cy="24" r="1" />
-              <circle cx="200" cy="105" r="1.2" />
-              <circle cx="390" cy="20" r="1" />
-              <circle cx="450" cy="115" r="0.8" />
-              <circle cx="590" cy="28" r="1" />
-              <circle cx="610" cy="110" r="1.2" />
-              <circle cx="790" cy="22" r="0.9" />
-              <circle cx="830" cy="118" r="1" />
-              <circle cx="950" cy="40" r="1.1" />
+            {/* Faint meridian & horizon coordinate hairlines */}
+            <g stroke="rgba(248,249,250,0.06)" strokeWidth="1">
+              <line x1="0" y1="80" x2="1000" y2="80" />
+              <line x1="0" y1="40" x2="1000" y2="40" />
+              <line x1="0" y1="120" x2="1000" y2="120" />
+              {STAR_NODES.map((node) => (
+                <line
+                  key={`meridian-${node.id}`}
+                  x1={node.x}
+                  y1="0"
+                  x2={node.x}
+                  y2="160"
+                />
+              ))}
             </g>
 
-            {/* Sweeping trajectory arc linking the nodes */}
+            {/* Deterministic faint background stars */}
+            <g fill="rgba(248,249,250,0.30)">
+              <circle cx="50" cy="28" r="1" />
+              <circle cx="200" cy="122" r="1.2" />
+              <circle cx="390" cy="24" r="1" />
+              <circle cx="450" cy="134" r="0.8" />
+              <circle cx="590" cy="30" r="1" />
+              <circle cx="610" cy="126" r="1.2" />
+              <circle cx="790" cy="24" r="0.9" />
+              <circle cx="830" cy="136" r="1" />
+              <circle cx="950" cy="44" r="1.1" />
+            </g>
+
+            {/* Base dashed guide trajectory arc linking the nodes */}
             <path
-              d="M 120 74 C 180 50, 250 36, 310 42 C 375 48, 440 90, 500 84 C 565 78, 630 36, 690 40 C 755 44, 820 82, 880 76"
-              stroke="rgba(248,249,250,0.20)"
+              d={TRAJECTORY_PATH}
+              stroke="rgba(248,249,250,0.18)"
               strokeWidth="1.25"
               strokeDasharray="4 4"
               fill="none"
             />
 
-            {/* Active trajectory arc when a leader is selected */}
+            {/* Kinetic active Ember trajectory arc when a leader is selected */}
             {activeMemberId !== null && (
               <path
-                d="M 120 74 C 180 50, 250 36, 310 42 C 375 48, 440 90, 500 84 C 565 78, 630 36, 690 40 C 755 44, 820 82, 880 76"
+                key={activeMemberId}
+                d={TRAJECTORY_PATH}
+                className="belief-trace"
+                style={{ '--trace-len': 860 } as React.CSSProperties}
                 stroke="#e35619"
-                strokeWidth="1.5"
-                strokeOpacity="0.85"
+                strokeWidth="1.75"
+                strokeOpacity="0.9"
+                strokeLinecap="round"
                 fill="none"
               />
             )}
@@ -133,20 +160,24 @@ export function ConstellationLeadershipGrid({
                       <circle
                         cx={node.x}
                         cy={node.y}
-                        r="11"
+                        r="13"
                         fill="none"
-                        stroke="#e35619"
-                        strokeWidth="1.25"
-                        strokeDasharray="2 2"
+                        stroke="#E35619"
+                        strokeWidth="1.2"
+                        className="belief-ripple"
                       />
-                      <circle cx={node.x} cy={node.y} r="5" fill="#e35619" />
+                      <path
+                        d={starPath(node.x, node.y, 8.5)}
+                        fill="#E35619"
+                        className="belief-bloom"
+                      />
                     </>
                   ) : (
                     <circle cx={node.x} cy={node.y} r="3.5" fill="#F8F9FA" />
                   )}
                   <text
                     x={node.x}
-                    y={node.y - 14}
+                    y={node.y - 16}
                     textAnchor="middle"
                     fill={isNodeActive ? '#F8F9FA' : 'rgba(248,249,250,0.72)'}
                     fontSize="11.5"
@@ -158,7 +189,7 @@ export function ConstellationLeadershipGrid({
                   </text>
                   <text
                     x={node.x}
-                    y={node.y + 22}
+                    y={node.y + 24}
                     textAnchor="middle"
                     fill="#F8F9FA"
                     fontSize="13.5"
@@ -229,7 +260,7 @@ export function ConstellationLeadershipGrid({
                 id={`team-member-${member.id}`}
                 className={`border bg-white p-6 md:p-8 transition-all min-w-0 md:col-span-2 lg:col-span-6 ${
                   isSelected
-                    ? 'border-[#e35619] ring-1 ring-[#e35619]'
+                    ? 'border-t-2 border-t-[#e35619] border-[#e35619] ring-1 ring-[#e35619]'
                     : isDimmed
                       ? 'border-[rgba(11,19,43,0.12)] opacity-75 hover:opacity-100'
                       : 'border-[rgba(11,19,43,0.12)] hover:border-[rgba(11,19,43,0.30)]'
@@ -334,7 +365,7 @@ export function ConstellationLeadershipGrid({
               id={`team-member-${member.id}`}
               className={`border bg-white p-6 md:p-8 flex flex-col justify-between gap-6 transition-all min-w-0 md:col-span-1 lg:col-span-3 ${
                 isSelected
-                  ? 'border-[#e35619] ring-1 ring-[#e35619]'
+                  ? 'border-t-2 border-t-[#e35619] border-[#e35619] ring-1 ring-[#e35619]'
                   : isDimmed
                     ? 'border-[rgba(11,19,43,0.12)] opacity-75 hover:opacity-100'
                     : 'border-[rgba(11,19,43,0.12)] hover:border-[rgba(11,19,43,0.30)]'

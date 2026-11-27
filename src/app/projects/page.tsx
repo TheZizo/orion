@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { getProjects } from '@/lib/orionData';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { MotionTrailDivider } from '@/components/motifs/MotionTrailDivider';
 import { ProjectsArchive } from '@/components/projects/ProjectsArchive';
 
 export const metadata: Metadata = {
@@ -32,10 +33,12 @@ export default function ProjectsPage() {
   return (
     <div>
       <PageHeader
+        className="!border-b-0"
         eyebrow="Mobility archive"
         title="Past and upcoming initiatives"
         lead="A record of European youth exchanges organized and hosted by Orion Fiatalok Informális Csoportja from Debrecen."
       />
+      <MotionTrailDivider from="navy" to="offwhite" height={56} />
 
       <div className="bg-[#F8F9FA] text-[#0B132B] py-16 md:py-24">
         <div className="container-orion">

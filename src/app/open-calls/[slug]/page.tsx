@@ -13,6 +13,7 @@ import { isSafeHttpsUrl } from '@/lib/storage';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { MotionTrailDivider } from '@/components/motifs/MotionTrailDivider';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { HybridApplicationFunnel } from '@/components/open-calls/HybridApplicationFunnel';
 
@@ -92,7 +93,10 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
   };
 
   const headerAside = (
-    <aside aria-label="Key details" className="border-t border-[rgba(248,249,250,0.14)] pt-4 lg:border-t-0 lg:pt-0">
+    <aside
+      aria-label="Key details"
+      className="bg-[#111D3B]/65 backdrop-blur-md border border-white/15 p-5"
+    >
       <dl className="space-y-3 type-caption text-[rgba(248,249,250,0.85)]">
         <div className="flex items-center justify-between gap-4">
           <dt className="text-[rgba(248,249,250,0.65)]">Status</dt>
@@ -100,7 +104,7 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
         </div>
         <div className="flex items-center justify-between gap-4">
           <dt className="text-[rgba(248,249,250,0.65)]">When</dt>
-          <dd className="tabular-nums font-medium text-[#F8F9FA]">{datesFormatted}</dd>
+          <dd className="tabular-nums font-medium text-[#F8F9FA] text-right">{datesFormatted}</dd>
         </div>
         <div className="flex items-center justify-between gap-4">
           <dt className="text-[rgba(248,249,250,0.65)]">Where</dt>
@@ -110,7 +114,7 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
         </div>
         <div className="flex items-center justify-between gap-4">
           <dt className="text-[rgba(248,249,250,0.65)]">Deadline</dt>
-          <dd className="tabular-nums font-medium text-[#F8F9FA]">{call.applicationDeadline}</dd>
+          <dd className="tabular-nums font-medium text-[#F8F9FA] text-right">{call.applicationDeadline}</dd>
         </div>
       </dl>
     </aside>
@@ -126,6 +130,7 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
       />
       {/* Page Header on Midnight Navy with Deterministic Stardust & Elliptical Orbit */}
       <PageHeader
+        className="!border-b-0"
         breadcrumb={[
           { label: 'Open calls', href: '/open-calls' },
           { label: call.title },
@@ -135,6 +140,7 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
         lead={call.summary}
         aside={headerAside}
       />
+      <MotionTrailDivider from="navy" to="offwhite" height={56} />
 
       {/* Main Content on Off-White Canvas */}
       <Section tone="light" spacing="lg">
@@ -149,7 +155,7 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
                 </p>
               </div>
 
-              {/* A day in the exchange (Vertical Timeline with real numbering 1, 2, 3...) */}
+              {/* A day in the exchange (Borderless Ember Phase Rail) */}
               <div className="space-y-6 pt-6 border-t border-[rgba(11,19,43,0.10)]">
                 <div>
                   <h2 className="type-h2 text-[#0B132B] font-bold">
@@ -160,22 +166,23 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
                   </p>
                 </div>
 
-                <ol className="relative pl-8 border-l border-[rgba(11,19,43,0.18)] ml-3 space-y-8 my-6 list-none">
+                <ol className="divide-y divide-[rgba(11,19,43,0.10)] border-t border-b border-[rgba(11,19,43,0.10)] my-6 list-none">
                   {call.dailyExperience.map((item, idx) => (
-                    <li key={idx} className="relative">
-                      {/* Real sequential numeral marker */}
+                    <li key={idx} className="py-5 flex items-baseline gap-5">
                       <span
-                        className="absolute -left-[45px] top-0.5 w-6 h-6 border border-[#0B132B] bg-[#F8F9FA] text-[#0B132B] flex items-center justify-center text-xs font-bold tabular-nums"
+                        className="text-sm font-bold text-[#E35619] tabular-nums shrink-0"
                         aria-hidden="true"
                       >
-                        {idx + 1}
+                        {String(idx + 1).padStart(2, '0')}
                       </span>
-                      <h3 className="type-h3 text-[#0B132B] font-semibold text-lg">
-                        {item.label}
-                      </h3>
-                      <p className="type-body text-[#0B132B]/80 mt-1">
-                        {item.description}
-                      </p>
+                      <div className="min-w-0 space-y-1">
+                        <h3 className="type-h3 text-[#0B132B] font-semibold text-lg">
+                          {item.label}
+                        </h3>
+                        <p className="type-body text-[#0B132B]/80">
+                          {item.description}
+                        </p>
+                      </div>
                     </li>
                   ))}
                 </ol>
@@ -187,10 +194,10 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
                   Venue
                 </h2>
 
-                <div className="border border-[rgba(11,19,43,0.12)] bg-white p-6 space-y-3">
+                <div className="border-t border-[rgba(11,19,43,0.12)] pt-4 space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2 type-body font-semibold text-[#0B132B]">
-                      <MapPin className="w-5 h-5 text-[#e35619]" aria-hidden="true" />
+                      <MapPin className="w-5 h-5 text-[#E35619]" aria-hidden="true" />
                       <span>{call.city}, {call.country}</span>
                     </div>
                   </div>
@@ -229,21 +236,21 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
                   Who can apply
                 </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-2">
-                  <div className="border border-[rgba(11,19,43,0.12)] bg-white p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 my-2">
+                  <div className="border-t border-[rgba(11,19,43,0.12)] pt-4">
                     <span className="block text-xs text-[#0B132B]/60 font-medium">
                       Age eligibility
                     </span>
-                    <span className="type-h3 text-[#0B132B] font-bold mt-1 block">
+                    <span className="type-h3 text-[#0B132B] font-bold tabular-nums mt-1 block">
                       {call.ageRange}
                     </span>
                   </div>
 
-                  <div className="border border-[rgba(11,19,43,0.12)] bg-white p-4">
+                  <div className="border-t border-[rgba(11,19,43,0.12)] pt-4">
                     <span className="block text-xs text-[#0B132B]/60 font-medium">
                       Cohort per partner
                     </span>
-                    <span className="type-body font-bold text-[#0B132B] mt-1 block">
+                    <span className="type-body font-bold text-[#0B132B] tabular-nums mt-1 block">
                       {call.participantsPerCountry}
                     </span>
                   </div>
@@ -331,37 +338,37 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Right 4 Columns: Sticky Quick Navigator & Meta */}
+            {/* Right 4 Columns: Sticky Observatory Dock */}
             <aside className="col-span-12 lg:col-span-4 space-y-6">
-              <div className="border border-[rgba(11,19,43,0.12)] bg-white p-6 space-y-4 lg:sticky lg:top-24">
-                <h3 className="type-h3 text-base font-semibold text-[#0B132B]">
+              <div className="bg-[#0B132B] text-[#F8F9FA] border-t-2 border-t-[#E35619] p-6 space-y-5 lg:sticky lg:top-24">
+                <h3 className="type-h3 text-base font-semibold text-[#F8F9FA]">
                   Trajectory details
                 </h3>
 
-                <dl className="space-y-3 type-caption text-[#0B132B]/85">
-                  <div className="flex justify-between py-1.5 border-b border-[rgba(11,19,43,0.06)]">
-                    <dt className="text-[#0B132B]/60">Status</dt>
-                    <dd><StatusBadge status={call.status} tone="light" /></dd>
+                <dl className="space-y-3 type-caption text-[rgba(248,249,250,0.85)]">
+                  <div className="flex items-center justify-between gap-4 py-1.5 border-b border-white/10">
+                    <dt className="text-[rgba(248,249,250,0.65)]">Status</dt>
+                    <dd><StatusBadge status={call.status} tone="dark" /></dd>
                   </div>
 
-                  <div className="flex justify-between py-1.5 border-b border-[rgba(11,19,43,0.06)]">
-                    <dt className="text-[#0B132B]/60">Type</dt>
-                    <dd className="font-semibold text-[#0B132B]">{call.actionType}</dd>
+                  <div className="flex items-center justify-between gap-4 py-1.5 border-b border-white/10">
+                    <dt className="text-[rgba(248,249,250,0.65)]">Type</dt>
+                    <dd className="font-semibold text-[#F8F9FA] text-right">{call.actionType}</dd>
                   </div>
 
-                  <div className="flex justify-between py-1.5 border-b border-[rgba(11,19,43,0.06)]">
-                    <dt className="text-[#0B132B]/60">Destination</dt>
-                    <dd className="font-semibold text-[#0B132B]">{call.city}, {call.country}</dd>
+                  <div className="flex items-center justify-between gap-4 py-1.5 border-b border-white/10">
+                    <dt className="text-[rgba(248,249,250,0.65)]">Destination</dt>
+                    <dd className="font-semibold text-[#F8F9FA] text-right">{call.city}, {call.country}</dd>
                   </div>
 
-                  <div className="flex justify-between py-1.5 border-b border-[rgba(11,19,43,0.06)]">
-                    <dt className="text-[#0B132B]/60">Cohort size</dt>
-                    <dd className="font-medium text-[#0B132B]">{call.participantsPerCountry}</dd>
+                  <div className="flex items-center justify-between gap-4 py-1.5 border-b border-white/10">
+                    <dt className="text-[rgba(248,249,250,0.65)]">Cohort size</dt>
+                    <dd className="font-medium text-[#F8F9FA] tabular-nums text-right">{call.participantsPerCountry}</dd>
                   </div>
 
-                  <div className="flex justify-between py-1.5 border-b border-[rgba(11,19,43,0.06)]">
-                    <dt className="text-[#0B132B]/60">Application</dt>
-                    <dd className="font-medium text-[#0B132B]">
+                  <div className="flex items-center justify-between gap-4 py-1.5 border-b border-white/10">
+                    <dt className="text-[rgba(248,249,250,0.65)]">Application</dt>
+                    <dd className="font-medium text-[#F8F9FA] text-right">
                       {call.status === 'Opening soon'
                         ? 'Opening soon'
                         : call.applicationMode === 'internal'
@@ -370,9 +377,9 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
                     </dd>
                   </div>
 
-                  <div className="flex justify-between py-1.5 border-b border-[rgba(11,19,43,0.06)]">
-                    <dt className="text-[#0B132B]/60">Deadline</dt>
-                    <dd className="font-semibold text-[#0B132B]">{call.applicationDeadline}</dd>
+                  <div className="flex items-center justify-between gap-4 py-1.5 border-b border-white/10">
+                    <dt className="text-[rgba(248,249,250,0.65)]">Deadline</dt>
+                    <dd className="font-semibold text-[#F8F9FA] tabular-nums text-right">{call.applicationDeadline}</dd>
                   </div>
                 </dl>
 
@@ -380,14 +387,14 @@ export default async function OpenCallDetailPage({ params }: PageProps) {
                   {call.status === 'Closed' ? (
                     <Link
                       href="/open-calls"
-                      className="block w-full py-2.5 px-4 text-center text-xs font-semibold bg-[#0B132B] text-[#F8F9FA] hover:bg-[#111D3B] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B]"
+                      className="block w-full py-2.5 px-4 text-center text-xs font-bold bg-[#E35619] text-[#0B132B] hover:bg-[#eb6124] active:bg-[#c9460e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B132B]"
                     >
                       Browse active open calls
                     </Link>
                   ) : (
                     <a
                       href="#apply"
-                      className="block w-full py-2.5 px-4 text-center text-xs font-semibold bg-[#0B132B] text-[#F8F9FA] hover:bg-[#111D3B] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B]"
+                      className="block w-full py-2.5 px-4 text-center text-xs font-bold bg-[#E35619] text-[#0B132B] hover:bg-[#eb6124] active:bg-[#c9460e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F8F9FA] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B132B]"
                     >
                       {call.status === 'Opening soon'
                         ? 'Register early interest'

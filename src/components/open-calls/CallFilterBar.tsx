@@ -47,15 +47,52 @@ export function CallFilterBar({
     router.push(pathname, { scroll: false });
   };
 
+  const statusPills = [
+    { label: 'All', value: '' },
+    { label: 'Opening soon', value: 'Opening soon' },
+    { label: 'Open', value: 'Open' },
+    { label: 'Closed', value: 'Closed' },
+  ];
+
   return (
     <div
-      className={`border-b border-[rgba(11,19,43,0.10)] pb-6 space-y-4 ${className}`.trim()}
+      className={`border-b border-[rgba(11,19,43,0.10)] pb-6 space-y-5 ${className}`.trim()}
     >
+      {/* Quick Status Filter Pills */}
+      <div
+        role="group"
+        aria-label="Quick status filter"
+        className="flex flex-wrap items-center gap-2"
+      >
+        {statusPills.map((pill) => {
+          const isActive =
+            pill.value === ''
+              ? currentStatus === 'all'
+              : currentStatus === pill.value;
+
+          return (
+            <button
+              key={pill.label}
+              type="button"
+              aria-pressed={isActive}
+              onClick={() => handleFilterChange('status', pill.value)}
+              className={`h-9 px-3.5 rounded-none text-[13px] font-medium transition-colors cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 ${
+                isActive
+                  ? 'bg-[#0B132B] text-[#F8F9FA] border border-[#0B132B] border-t-2 border-t-[#E35619]'
+                  : 'bg-transparent text-[rgba(11,19,43,0.75)] border border-[rgba(11,19,43,0.14)] hover:border-[rgba(11,19,43,0.35)] hover:text-[#0B132B]'
+              }`}
+            >
+              {pill.label}
+            </button>
+          );
+        })}
+      </div>
+
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        {/* Quiet Filter Controls */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-1 max-w-2xl">
+        {/* Quiet Underline Filter Controls */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 flex-1 max-w-2xl min-w-0">
           {/* Action Type */}
-          <div>
+          <div className="min-w-0">
             <label
               htmlFor="filter-type"
               className="block text-[12px] font-medium text-[rgba(11,19,43,0.7)] mb-1"
@@ -67,7 +104,7 @@ export function CallFilterBar({
               name="type"
               value={currentType}
               onChange={(e) => handleFilterChange('type', e.target.value)}
-              className="w-full h-11 px-3 border border-[rgba(11,19,43,0.18)] bg-white text-[#0B132B] rounded-none text-[14px] focus:outline-none focus:ring-2 focus:ring-[#0B132B] transition-colors"
+              className="w-full h-11 px-0 border-0 border-b border-[rgba(11,19,43,0.22)] bg-transparent text-[#0B132B] rounded-none text-[14px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus:border-b-[#0B132B] transition-colors cursor-pointer"
             >
               <option value="all">All action types</option>
               <option value="Youth Exchange">Youth Exchange</option>
@@ -76,7 +113,7 @@ export function CallFilterBar({
           </div>
 
           {/* Country */}
-          <div>
+          <div className="min-w-0">
             <label
               htmlFor="filter-country"
               className="block text-[12px] font-medium text-[rgba(11,19,43,0.7)] mb-1"
@@ -88,7 +125,7 @@ export function CallFilterBar({
               name="country"
               value={currentCountry}
               onChange={(e) => handleFilterChange('country', e.target.value)}
-              className="w-full h-11 px-3 border border-[rgba(11,19,43,0.18)] bg-white text-[#0B132B] rounded-none text-[14px] focus:outline-none focus:ring-2 focus:ring-[#0B132B] transition-colors"
+              className="w-full h-11 px-0 border-0 border-b border-[rgba(11,19,43,0.22)] bg-transparent text-[#0B132B] rounded-none text-[14px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus:border-b-[#0B132B] transition-colors cursor-pointer"
             >
               <option value="all">All countries</option>
               {countries.map((c) => (
@@ -100,7 +137,7 @@ export function CallFilterBar({
           </div>
 
           {/* Status */}
-          <div>
+          <div className="min-w-0">
             <label
               htmlFor="filter-status"
               className="block text-[12px] font-medium text-[rgba(11,19,43,0.7)] mb-1"
@@ -112,7 +149,7 @@ export function CallFilterBar({
               name="status"
               value={currentStatus}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="w-full h-11 px-3 border border-[rgba(11,19,43,0.18)] bg-white text-[#0B132B] rounded-none text-[14px] focus:outline-none focus:ring-2 focus:ring-[#0B132B] transition-colors"
+              className="w-full h-11 px-0 border-0 border-b border-[rgba(11,19,43,0.22)] bg-transparent text-[#0B132B] rounded-none text-[14px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus:border-b-[#0B132B] transition-colors cursor-pointer"
             >
               <option value="all">All statuses</option>
               <option value="Open">Open</option>
@@ -129,7 +166,7 @@ export function CallFilterBar({
             <button
               type="button"
               onClick={handleClearFilters}
-              className="h-11 px-4 border border-[rgba(11,19,43,0.18)] text-[#0B132B] rounded-none font-medium text-[13px] hover:bg-[rgba(11,19,43,0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] transition-colors cursor-pointer select-none"
+              className="h-11 px-4 border border-[rgba(11,19,43,0.18)] text-[#0B132B] rounded-none font-medium text-[13px] hover:bg-[rgba(11,19,43,0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] focus-visible:ring-offset-2 transition-colors cursor-pointer select-none"
             >
               Clear filters
             </button>
@@ -141,7 +178,7 @@ export function CallFilterBar({
       <div
         aria-live="polite"
         role="status"
-        className="flex items-center justify-between pt-2 text-[13px] text-[rgba(11,19,43,0.65)]"
+        className="flex flex-wrap items-center justify-between gap-2 pt-2 text-[13px] text-[rgba(11,19,43,0.65)]"
       >
         <span className="tabular-nums">
           Showing {filteredCount} of {totalCount} open calls

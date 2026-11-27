@@ -73,6 +73,33 @@ export function PageHeader({
           className="absolute inset-0 w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <defs>
+            <radialGradient id="page-header-graticule-fade" cx="72%" cy="48%" r="60%">
+              <stop offset="0%" stopColor="white" stopOpacity="1" />
+              <stop offset="55%" stopColor="white" stopOpacity="0.55" />
+              <stop offset="100%" stopColor="black" stopOpacity="0" />
+            </radialGradient>
+            <mask id="page-header-graticule-mask">
+              <rect width="100%" height="100%" fill="url(#page-header-graticule-fade)" />
+            </mask>
+          </defs>
+
+          {/* Subtle radial-masked celestial coordinate graticule */}
+          <g
+            mask="url(#page-header-graticule-mask)"
+            fill="none"
+            stroke="rgba(248,249,250,0.055)"
+            strokeWidth="1"
+          >
+            <line x1="0%" y1="52%" x2="100%" y2="52%" />
+            <line x1="72%" y1="0%" x2="72%" y2="100%" />
+            <line x1="48%" y1="0%" x2="48%" y2="100%" strokeDasharray="3 6" />
+            <line x1="0%" y1="26%" x2="100%" y2="26%" strokeDasharray="3 6" />
+            <path d="M 420 -40 Q 920 140 1520 340" />
+            <path d="M 580 420 Q 1000 180 1480 -20" />
+            <path d="M 720 0 A 480 480 0 0 0 1320 420" />
+          </g>
+
           {FIXED_STARS.map((s, idx) => (
             <circle
               key={idx}

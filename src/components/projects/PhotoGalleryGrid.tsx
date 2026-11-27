@@ -132,7 +132,7 @@ export function PhotoGalleryGrid({
 
   const getAspectRatio = (colSpan: string) => {
     if (colSpan.includes('col-span-8')) return 'aspect-[16/10]';
-    if (colSpan.includes('col-span-12')) return 'aspect-[16/9] md:aspect-[21/9]';
+    if (colSpan.includes('col-span-12')) return 'aspect-[16/10] md:aspect-[16/9]';
     return 'aspect-[3/2]';
   };
 
@@ -157,7 +157,7 @@ export function PhotoGalleryGrid({
             onClick={() => setSelectedCategory('All')}
             className={`px-3.5 py-1.5 text-xs font-medium border transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] ${
               selectedCategory === 'All'
-                ? 'bg-[#0B132B] text-[#F8F9FA] border-[#0B132B]'
+                ? 'bg-[#0B132B] text-[#F8F9FA] border-[#0B132B] border-t-2 border-t-[#E35619]'
                 : 'bg-transparent text-[#0B132B] border-[rgba(11,19,43,0.18)] hover:border-[#0B132B]'
             }`}
           >
@@ -175,7 +175,7 @@ export function PhotoGalleryGrid({
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-3.5 py-1.5 text-xs font-medium border transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B132B] ${
                   isSelected
-                    ? 'bg-[#0B132B] text-[#F8F9FA] border-[#0B132B]'
+                    ? 'bg-[#0B132B] text-[#F8F9FA] border-[#0B132B] border-t-2 border-t-[#E35619]'
                     : 'bg-transparent text-[#0B132B] border-[rgba(11,19,43,0.18)] hover:border-[#0B132B]'
                 }`}
               >
@@ -229,18 +229,18 @@ export function PhotoGalleryGrid({
                           ? '(max-width: 768px) 100vw, 66vw'
                           : '(max-width: 768px) 100vw, 33vw'
                     }
-                    className="object-cover group-hover:scale-[1.02] transition-transform duration-300 ease-out motion-reduce:transform-none"
+                    className="object-cover object-[50%_48%] group-hover:scale-[1.02] transition-transform duration-300 ease-out motion-reduce:transform-none"
                   />
 
                   {/* Category Badge Tag */}
                   {item.category && (
-                    <span className="absolute top-3 left-3 bg-[#0B132B]/85 text-[#F8F9FA] text-[11px] font-medium px-2 py-0.5 border border-[rgba(248,249,250,0.18)]">
+                    <span className="absolute top-3 left-3 bg-[#0B132B]/75 backdrop-blur-sm text-[#F8F9FA] text-[11px] font-medium px-2 py-0.5 border border-[rgba(248,249,250,0.18)]">
                       {item.category}
                     </span>
                   )}
 
                   {/* "Inspect frame" overlay badge */}
-                  <span className="absolute bottom-3 right-3 bg-[#0B132B]/85 text-[#F8F9FA] text-[11px] px-2.5 py-1 flex items-center gap-1.5 border border-[rgba(248,249,250,0.18)] opacity-90 group-hover:opacity-100 transition-opacity">
+                  <span className="absolute bottom-3 right-3 bg-[#0B132B]/75 backdrop-blur-sm text-[#F8F9FA] text-[11px] px-2.5 py-1 flex items-center gap-1.5 border border-[rgba(248,249,250,0.18)] opacity-90 group-hover:opacity-100 transition-opacity">
                     <svg
                       width="12"
                       height="12"

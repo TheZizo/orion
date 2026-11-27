@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { getOpenCalls } from '@/lib/orionData';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { MotionTrailDivider } from '@/components/motifs/MotionTrailDivider';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { OpenCallsDirectory } from '@/components/open-calls/OpenCallsDirectory';
@@ -34,10 +35,12 @@ export default function OpenCallsPage() {
   return (
     <>
       <PageHeader
+        className="!border-b-0"
         eyebrow="Open calls"
         title="Find your next trajectory."
         lead="Explore fully funded Erasmus+ mobilities organized by Orion and accredited European partners. Every exchange is an intentional arc toward personal growth, human connection, and cross-border leadership."
       />
+      <MotionTrailDivider from="navy" to="offwhite" height={56} />
 
       <Section tone="light" spacing="lg">
         <Container>
